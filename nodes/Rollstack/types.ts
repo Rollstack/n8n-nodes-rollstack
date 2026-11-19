@@ -1,4 +1,7 @@
-/** Where an input goes in a Rollstack tool's arguments: one of its parts, or beside them for `idempotencyKey`. */
+/**
+ * Where an input goes in a request: the path (params), the query string or the JSON body, or for `idempotencyKey`,
+ * which has no part, the Idempotency-Key header.
+ */
 export type InputPart = 'params' | 'query' | 'body' | '';
 
 /** How the node reads a parameter's value before it sends it to Rollstack. */
@@ -18,10 +21,16 @@ export interface ToolInput {
 	nullable?: boolean;
 }
 
-/** One operation of the node: the Rollstack tool it calls, and how its parameters become the tool's arguments. */
+/**
+ * One operation of the node: the Rollstack REST endpoint it calls, named after the tool of Rollstack's MCP server that
+ * calls the same endpoint, and how its parameters become the endpoint's path, query and body.
+ */
 export interface ToolSpec {
 	tool: string;
-	/** The parts the tool needs even when none of their inputs is set. */
+	method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+	/** The endpoint's path under https://api.rollstack.com/public/v1, with its path parameters in braces. */
+	path: string;
+	/** The parts the endpoint needs even when none of their inputs is set. */
 	parts: Array<'params' | 'query' | 'body'>;
 	inputs: ToolInput[];
 }

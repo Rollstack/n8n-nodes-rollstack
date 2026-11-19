@@ -9,12 +9,11 @@ import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workf
 
 import { buildArguments } from './arguments';
 import { properties, toolSpecs } from './generated';
-import { callTool } from './transport';
+import { callEndpoint } from './transport';
 
-// A programmatic node, not a declarative one: every operation is the same JSON-RPC call to Rollstack's MCP server,
-// whose answer can come as an event stream, and the node retries it with the same idempotency key, opens a session
-// when the server asks for one, tells an error from a call held for the user's confirmation, and returns images as
-// binary data. Declarative routing can't express that.
+// A programmatic node, not a declarative one: its 118 operations are generated from Rollstack's tool definitions, and
+// the node retries a request with the same idempotency key, tells an error from a call held for confirmation, and
+// returns slide images as binary data. Declarative routing can't express that.
 export class Rollstack implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Rollstack',
@@ -56,13 +55,14 @@ export class Rollstack implements INodeType {
 					);
 				}
 				const args = buildArguments.call(this, spec, itemIndex);
-				const result = await callTool.call(this, spec.tool, args);
+				const result = await callEndpoint.call(this, spec, args);
 
 				const item: INodeExecutionData = { json: result.json, pairedItem: { item: itemIndex } };
 				if (result.images.length) {
 					item.binary = {};
 					for (const [index, image] of result.images.entries()) {
-						const extension = image.mimeType.split('/')[1] ?? 'png';
+						const subtype = image.mimeType.split('/')[1] ?? 'png';
+						const extension = subtype === 'jpeg' ? 'jpg' : subtype;
 						item.binary[`image${index + 1}`] = await this.helpers.prepareBinaryData(
 							Buffer.from(image.data, 'base64'),
 							`${spec.tool}-${index + 1}.${extension}`,

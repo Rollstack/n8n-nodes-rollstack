@@ -1,0 +1,602 @@
+{
+  "source": "https://api.rollstack.com/public/v1/openapi.json",
+  "operations": {
+    "listReports": {
+      "method": "GET",
+      "path": "/reports",
+      "group": "Reports"
+    },
+    "getReport": {
+      "method": "GET",
+      "path": "/reports/{id}",
+      "group": "Reports"
+    },
+    "convertReport": {
+      "method": "POST",
+      "path": "/reports/{id}/conversions",
+      "group": "Reports"
+    },
+    "createReport": {
+      "method": "POST",
+      "path": "/reports",
+      "group": "Reports"
+    },
+    "duplicateReport": {
+      "method": "POST",
+      "path": "/reports/{id}/duplicates",
+      "group": "Reports"
+    },
+    "updateReport": {
+      "method": "PATCH",
+      "path": "/reports/{id}",
+      "group": "Reports"
+    },
+    "batchGetReports": {
+      "method": "POST",
+      "path": "/reports/batch-get",
+      "group": "Reports"
+    },
+    "listTemplates": {
+      "method": "GET",
+      "path": "/templates",
+      "group": "Templates"
+    },
+    "showTemplates": null,
+    "getTemplatePickerCovers": null,
+    "createTemplate": {
+      "method": "POST",
+      "path": "/templates",
+      "group": "Templates"
+    },
+    "updateTemplate": {
+      "method": "PATCH",
+      "path": "/templates/{templateId}",
+      "group": "Templates"
+    },
+    "deleteTemplate": {
+      "method": "DELETE",
+      "path": "/templates/{templateId}",
+      "group": "Templates"
+    },
+    "applyReportTemplate": {
+      "method": "POST",
+      "path": "/reports/{id}/template",
+      "group": "Templates"
+    },
+    "listReportVersions": {
+      "method": "GET",
+      "path": "/reports/{id}/versions",
+      "group": "Versions"
+    },
+    "saveReportVersion": {
+      "method": "POST",
+      "path": "/reports/{id}/versions",
+      "group": "Versions"
+    },
+    "restoreReportVersion": {
+      "method": "POST",
+      "path": "/reports/{id}/versions/{versionId}/restore",
+      "group": "Versions"
+    },
+    "getReportMessage": {
+      "method": "GET",
+      "path": "/reports/{id}/messages/{messageId}",
+      "group": "Chat"
+    },
+    "getReportMessageProgress": null,
+    "sendReportMessage": {
+      "method": "POST",
+      "path": "/reports/{id}/messages",
+      "group": "Chat"
+    },
+    "approveReportMessageProposal": {
+      "method": "POST",
+      "path": "/reports/{id}/messages/{messageId}/replies/{replyId}/approve",
+      "group": "Chat"
+    },
+    "cancelReportMessage": {
+      "method": "POST",
+      "path": "/reports/{id}/messages/{messageId}/cancel",
+      "group": "Chat"
+    },
+    "rejectReportMessageProposal": {
+      "method": "POST",
+      "path": "/reports/{id}/messages/{messageId}/replies/{replyId}/reject",
+      "group": "Chat"
+    },
+    "listMemories": {
+      "method": "GET",
+      "path": "/memories",
+      "group": "Memories"
+    },
+    "createMemory": {
+      "method": "POST",
+      "path": "/memories",
+      "group": "Memories"
+    },
+    "updateMemory": {
+      "method": "PATCH",
+      "path": "/memories/{memoryId}",
+      "group": "Memories"
+    },
+    "deleteMemory": {
+      "method": "DELETE",
+      "path": "/memories/{memoryId}",
+      "group": "Memories"
+    },
+    "listReportRuns": {
+      "method": "GET",
+      "path": "/reports/{id}/runs",
+      "group": "Runs"
+    },
+    "getReportRun": {
+      "method": "GET",
+      "path": "/reports/{id}/runs/{runId}",
+      "group": "Runs"
+    },
+    "listReportSyncs": {
+      "method": "GET",
+      "path": "/reports/{id}/syncs",
+      "group": "Runs"
+    },
+    "listRuns": {
+      "method": "GET",
+      "path": "/runs",
+      "group": "Runs"
+    },
+    "startReportRun": {
+      "method": "POST",
+      "path": "/reports/{id}/runs",
+      "group": "Runs"
+    },
+    "batchStartReportRuns": {
+      "method": "POST",
+      "path": "/reports/batch-run",
+      "group": "Runs"
+    },
+    "cancelReportRun": {
+      "method": "POST",
+      "path": "/reports/{id}/runs/{runId}/cancel",
+      "group": "Runs"
+    },
+    "getReportCloudExport": {
+      "method": "GET",
+      "path": "/reports/{id}/cloud-export",
+      "group": "Exports"
+    },
+    "updateReportCloudExport": {
+      "method": "PUT",
+      "path": "/reports/{id}/cloud-export",
+      "group": "Exports"
+    },
+    "exportReport": {
+      "method": "POST",
+      "path": "/reports/{id}/exports",
+      "group": "Exports"
+    },
+    "getReportContent": {
+      "method": "GET",
+      "path": "/reports/{id}/content",
+      "group": "Content"
+    },
+    "getReportDesign": {
+      "method": "GET",
+      "path": "/reports/{id}/design",
+      "group": "Content"
+    },
+    "getReportSlideHtml": {
+      "method": "GET",
+      "path": "/reports/{id}/slides/html",
+      "group": "Content"
+    },
+    "getReportSlideImages": {
+      "method": "GET",
+      "path": "/reports/{id}/slides/images",
+      "group": "Content"
+    },
+    "showReport": null,
+    "getReportViewerSlideImages": null,
+    "arrangeReportSlides": {
+      "method": "PATCH",
+      "path": "/reports/{id}/slides",
+      "group": "Content"
+    },
+    "updateReportTheme": {
+      "method": "PATCH",
+      "path": "/reports/{id}/theme",
+      "group": "Content"
+    },
+    "renderReportSlides": {
+      "method": "POST",
+      "path": "/reports/{id}/slides/render",
+      "group": "Content"
+    },
+    "saveReportSlides": {
+      "method": "POST",
+      "path": "/reports/{id}/slides",
+      "group": "Content"
+    },
+    "getDataset": {
+      "method": "GET",
+      "path": "/datasets/{id}",
+      "group": "Uploaded files"
+    },
+    "createDatasetUpload": {
+      "method": "POST",
+      "path": "/datasets/uploads",
+      "group": "Uploaded files"
+    },
+    "createDocument": {
+      "method": "POST",
+      "path": "/documents",
+      "group": "Uploaded files"
+    },
+    "createDataset": {
+      "method": "POST",
+      "path": "/datasets",
+      "group": "Uploaded files"
+    },
+    "replaceDataset": {
+      "method": "PUT",
+      "path": "/datasets/{id}",
+      "group": "Uploaded files"
+    },
+    "deleteDataset": {
+      "method": "DELETE",
+      "path": "/datasets/{id}",
+      "group": "Uploaded files"
+    },
+    "getReportDataGuide": {
+      "method": "GET",
+      "path": "/data-guide",
+      "group": "Datasheets"
+    },
+    "listReportDatasheets": {
+      "method": "GET",
+      "path": "/reports/{id}/datasheets",
+      "group": "Datasheets"
+    },
+    "getReportDatasheet": {
+      "method": "GET",
+      "path": "/reports/{id}/datasheets/{datasheetId}",
+      "group": "Datasheets"
+    },
+    "getReportDatasheetData": {
+      "method": "GET",
+      "path": "/reports/{id}/datasheets/{datasheetId}/data",
+      "group": "Datasheets"
+    },
+    "addReportDatasheets": {
+      "method": "POST",
+      "path": "/reports/{id}/datasheets",
+      "group": "Datasheets"
+    },
+    "removeReportDatasheet": {
+      "method": "DELETE",
+      "path": "/reports/{id}/datasheets/{datasheetId}",
+      "group": "Datasheets"
+    },
+    "addReportDashboardElements": {
+      "method": "POST",
+      "path": "/reports/{id}/datasheets/{datasheetId}/elements",
+      "group": "Datasheets"
+    },
+    "previewReportDatasheetChanges": {
+      "method": "POST",
+      "path": "/reports/{id}/datasheets/changes/preview",
+      "group": "Datasheets"
+    },
+    "queryReportData": {
+      "method": "POST",
+      "path": "/reports/{id}/data/query",
+      "group": "Datasheets"
+    },
+    "saveReportDatasheetChanges": {
+      "method": "POST",
+      "path": "/reports/{id}/datasheets/changes",
+      "group": "Datasheets"
+    },
+    "getReportParameters": {
+      "method": "GET",
+      "path": "/reports/{id}/parameters",
+      "group": "Parameters"
+    },
+    "createReportParameter": {
+      "method": "POST",
+      "path": "/reports/{id}/parameters",
+      "group": "Parameters"
+    },
+    "updateReportParameter": {
+      "method": "PATCH",
+      "path": "/reports/{id}/parameters/{parameterId}",
+      "group": "Parameters"
+    },
+    "deleteReportParameter": {
+      "method": "DELETE",
+      "path": "/reports/{id}/parameters/{parameterId}",
+      "group": "Parameters"
+    },
+    "getReportViews": {
+      "method": "GET",
+      "path": "/reports/{id}/views",
+      "group": "Sharing"
+    },
+    "shareReport": {
+      "method": "PUT",
+      "path": "/reports/{id}/shares/{userId}",
+      "group": "Sharing"
+    },
+    "unshareReport": {
+      "method": "DELETE",
+      "path": "/reports/{id}/shares/{userId}",
+      "group": "Sharing"
+    },
+    "batchShareReports": {
+      "method": "POST",
+      "path": "/reports/batch-share",
+      "group": "Sharing"
+    },
+    "listReportComments": {
+      "method": "GET",
+      "path": "/reports/{id}/comments",
+      "group": "Comments"
+    },
+    "createReportComment": {
+      "method": "POST",
+      "path": "/reports/{id}/comments",
+      "group": "Comments"
+    },
+    "resolveReportComment": {
+      "method": "POST",
+      "path": "/reports/{id}/comments/{commentId}/resolve",
+      "group": "Comments"
+    },
+    "getReportSchedules": {
+      "method": "GET",
+      "path": "/reports/{id}/schedules",
+      "group": "Schedules"
+    },
+    "updateReportSchedules": {
+      "method": "PUT",
+      "path": "/reports/{id}/schedules",
+      "group": "Schedules"
+    },
+    "batchUpdateReportSchedules": {
+      "method": "POST",
+      "path": "/reports/batch-update-schedules",
+      "group": "Schedules"
+    },
+    "listEmails": {
+      "method": "GET",
+      "path": "/emails",
+      "group": "Email"
+    },
+    "getReportEmailConfig": {
+      "method": "GET",
+      "path": "/reports/{id}/email-config",
+      "group": "Email"
+    },
+    "listReportEmails": {
+      "method": "GET",
+      "path": "/reports/{id}/emails",
+      "group": "Email"
+    },
+    "updateReportEmailConfig": {
+      "method": "PUT",
+      "path": "/reports/{id}/email-config",
+      "group": "Email"
+    },
+    "sendReportEmail": {
+      "method": "POST",
+      "path": "/reports/{id}/emails",
+      "group": "Email"
+    },
+    "sendReportTestEmail": {
+      "method": "POST",
+      "path": "/reports/{id}/emails/test",
+      "group": "Email"
+    },
+    "listBursts": {
+      "method": "GET",
+      "path": "/bursts",
+      "group": "Bursts"
+    },
+    "listBurstEmailConfigs": {
+      "method": "GET",
+      "path": "/bursts/{id}/email-configs",
+      "group": "Bursts"
+    },
+    "getBurstRun": {
+      "method": "GET",
+      "path": "/bursts/{id}/runs",
+      "group": "Bursts"
+    },
+    "getBurstSettings": {
+      "method": "GET",
+      "path": "/bursts/{id}/settings",
+      "group": "Bursts"
+    },
+    "listBurstVariants": {
+      "method": "GET",
+      "path": "/bursts/{id}/variants",
+      "group": "Bursts"
+    },
+    "getBurstVariantBatch": {
+      "method": "GET",
+      "path": "/bursts/{id}/variants/batches/{batchId}",
+      "group": "Bursts"
+    },
+    "listReportSyncFilters": {
+      "method": "GET",
+      "path": "/reports/{id}/syncs/{syncId}/filters",
+      "group": "Bursts"
+    },
+    "addBurstVariants": {
+      "method": "POST",
+      "path": "/bursts/{id}/variants",
+      "group": "Bursts"
+    },
+    "convertBurst": {
+      "method": "POST",
+      "path": "/bursts/{id}/conversions",
+      "group": "Bursts"
+    },
+    "createBurst": {
+      "method": "POST",
+      "path": "/bursts",
+      "group": "Bursts"
+    },
+    "createBurstEmailConfig": {
+      "method": "POST",
+      "path": "/bursts/{id}/email-configs",
+      "group": "Bursts"
+    },
+    "startBurstRun": {
+      "method": "POST",
+      "path": "/bursts/{id}/runs",
+      "group": "Bursts"
+    },
+    "sendBurstEmailConfig": {
+      "method": "POST",
+      "path": "/bursts/{id}/email-configs/{configId}/send",
+      "group": "Bursts"
+    },
+    "sendBurstVariantEmails": {
+      "method": "POST",
+      "path": "/bursts/{id}/variants/emails",
+      "group": "Bursts"
+    },
+    "renameBurst": {
+      "method": "PATCH",
+      "path": "/bursts/{id}",
+      "group": "Bursts"
+    },
+    "updateBurstVariantEmailSettings": {
+      "method": "PATCH",
+      "path": "/bursts/{id}/variants/email-settings",
+      "group": "Bursts"
+    },
+    "updateBurstEmailConfig": {
+      "method": "PATCH",
+      "path": "/bursts/{id}/email-configs/{configId}",
+      "group": "Bursts"
+    },
+    "updateBurstSettings": {
+      "method": "PATCH",
+      "path": "/bursts/{id}/settings",
+      "group": "Bursts"
+    },
+    "updateBurstVariantRecipients": {
+      "method": "PUT",
+      "path": "/bursts/{id}/variants/recipients",
+      "group": "Bursts"
+    },
+    "updateBurstFilters": {
+      "method": "PUT",
+      "path": "/bursts/{id}/filters",
+      "group": "Bursts"
+    },
+    "deleteBurst": {
+      "method": "DELETE",
+      "path": "/bursts/{id}",
+      "group": "Bursts"
+    },
+    "deleteBurstEmailConfig": {
+      "method": "DELETE",
+      "path": "/bursts/{id}/email-configs/{configId}",
+      "group": "Bursts"
+    },
+    "reapplyBurstFilters": {
+      "method": "POST",
+      "path": "/bursts/{id}/filters/reapply",
+      "group": "Bursts"
+    },
+    "removeBurstVariants": {
+      "method": "POST",
+      "path": "/bursts/{id}/variants/remove",
+      "group": "Bursts"
+    },
+    "sendBurstEmailConfigTest": {
+      "method": "POST",
+      "path": "/bursts/{id}/email-configs/{configId}/test",
+      "group": "Bursts"
+    },
+    "listConnections": {
+      "method": "GET",
+      "path": "/connections",
+      "group": "Connections"
+    },
+    "searchDashboards": {
+      "method": "GET",
+      "path": "/connections/{type}/{id}/dashboards",
+      "group": "Connections"
+    },
+    "getDashboard": {
+      "method": "GET",
+      "path": "/connections/{type}/{id}/dashboards/{dashboardId}",
+      "group": "Connections"
+    },
+    "searchModels": {
+      "method": "GET",
+      "path": "/connections/{type}/{id}/models",
+      "group": "Connections"
+    },
+    "searchTables": {
+      "method": "GET",
+      "path": "/connections/{type}/{id}/tables",
+      "group": "Connections"
+    },
+    "searchSpreadsheets": {
+      "method": "GET",
+      "path": "/spreadsheets",
+      "group": "Spreadsheets"
+    },
+    "getSpreadsheet": {
+      "method": "GET",
+      "path": "/spreadsheets/{id}",
+      "group": "Spreadsheets"
+    },
+    "listSmtpConnections": {
+      "method": "GET",
+      "path": "/smtp-connections",
+      "group": "SMTP connections"
+    },
+    "listFolders": {
+      "method": "GET",
+      "path": "/folders",
+      "group": "Folders"
+    },
+    "getFolder": {
+      "method": "GET",
+      "path": "/folders/{id}",
+      "group": "Folders"
+    },
+    "createFolder": {
+      "method": "POST",
+      "path": "/folders",
+      "group": "Folders"
+    },
+    "updateFolder": {
+      "method": "PATCH",
+      "path": "/folders/{id}",
+      "group": "Folders"
+    },
+    "shareFolder": {
+      "method": "PUT",
+      "path": "/folders/{id}/shares/{userId}",
+      "group": "Folders"
+    },
+    "unshareFolder": {
+      "method": "DELETE",
+      "path": "/folders/{id}/shares/{userId}",
+      "group": "Folders"
+    },
+    "submitFeedback": null,
+    "listMembers": {
+      "method": "GET",
+      "path": "/members",
+      "group": "Members"
+    },
+    "confirmAction": null
+  }
+}

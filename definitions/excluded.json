@@ -1,6 +1,9 @@
 {
-	"getTemplatePickerCovers": "Called only by the template picker that showTemplates opens in clients that can show it. showTemplates answers the templates in n8n.",
+	"showReport": "Only Rollstack's MCP server has it, and the node calls Rollstack's REST API: it opens a report viewer in clients that can show one. getReport, getReportContent and getReportSlideImages answer the same report.",
+	"showTemplates": "Only Rollstack's MCP server has it, and the node calls Rollstack's REST API: it opens a template picker in clients that can show one. listTemplates answers the same templates.",
+	"submitFeedback": "Only Rollstack's MCP server has it, and the node calls Rollstack's REST API: it sends Rollstack feedback about its MCP tools.",
+	"getTemplatePickerCovers": "Called only by the template picker that showTemplates opens in clients that can show it. listTemplates answers the templates in n8n.",
 	"getReportMessageProgress": "Called only by the progress view that sendReportMessage opens in clients that can show it. getReportMessage answers the same progress.",
 	"getReportViewerSlideImages": "Called only by the report viewer that showReport opens in clients that can show it. getReportSlideImages renders the same slides.",
-	"confirmAction": "Called only by the confirmation card Rollstack shows before a call that emails people or deletes reports, with a token only that card has. In n8n, you confirm such a call in Rollstack, at the link the operation answers."
+	"confirmAction": "Called only by the confirmation card Rollstack shows before a call from an AI client that emails people or deletes reports, with a token only that card has. With an API key, Rollstack's REST API runs such a call without one."
 }

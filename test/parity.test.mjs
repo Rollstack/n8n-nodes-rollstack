@@ -25,6 +25,26 @@ test('every tool of the server is an operation, apart from the excluded ones', (
 		);
 });
 
+test("every operation calls its tool's REST endpoint, and fills in each of its path parameters", () => {
+	const { operations } = JSON.parse(
+		readFileSync(new URL('../definitions/rest.json', import.meta.url), 'utf8'),
+	);
+	for (const [operation, spec] of Object.entries(toolSpecs)) {
+		assert.deepEqual(
+			{ method: spec.method, path: spec.path },
+			{ method: operations[operation].method, path: operations[operation].path },
+			operation,
+		);
+		const placeholders = [...spec.path.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
+		const params = spec.inputs.filter((input) => input.part === 'params');
+		assert.deepEqual(params.map((input) => input.name).sort(), placeholders, operation);
+		assert.ok(
+			params.every((input) => input.required),
+			`${operation}: a path parameter is optional`,
+		);
+	}
+});
+
 test('every operation is offered under exactly one resource', () => {
 	const offered = properties
 		.filter((property) => property.name === 'operation')

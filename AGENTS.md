@@ -2,24 +2,30 @@
 
 ## This repository
 
-The Rollstack node: one operation for each tool of Rollstack's MCP server (https://docs.rollstack.com/api/mcp-server).
+The Rollstack node: one operation for each endpoint of Rollstack's REST API (https://docs.rollstack.com/api) that
+Rollstack's MCP server also offers as a tool. Its inputs and descriptions come from the tool.
 
 - `nodes/Rollstack/generated.ts` and the operation tables in `README.md` are written by `scripts/generate.mjs` from
   `definitions/`. Don't edit them by hand: change the generator or the definitions, then run `npm run generate`. CI
   runs `npm run generate:check`.
-- The node has every tool the server lists, apart from those `definitions/excluded.json` gives a reason for. Don't
-  leave out a tool for any other reason, including tools that email people or delete data: list them in the README's
-  table instead, which the generator writes from `EMAILS_OR_DELETES`.
+- The node has every tool the server lists, apart from those `definitions/excluded.json` gives a reason for: tools
+  with no REST endpoint, and tools only a view of the MCP server calls. Don't leave out a tool for any other reason,
+  including tools that email people or delete data: list them in the README's table instead, which the generator
+  writes from `EMAILS_OR_DELETES`.
 - Each resource opens on the operation `DEFAULT_OPERATIONS` in `scripts/generate.mjs` names: one that only reads, or
   the resource's first step. Never one that emails people, deletes something or approves a change.
 - As an AI Agent's tool, each operation has a `toolDescription` parameter, shown only in tool mode (`'@tool': [true]`),
   that starts as the tool's whole description from Rollstack. n8n's own automatic description is the operation's name
   alone, which doesn't tell the agent what to call next.
 - `npm run update-definitions` refreshes `definitions/` from Rollstack. It needs `ROLLSTACK_API_KEY`, a key with every
-  scope, which an owner or admin of the organization creates. Never ask for a key in the chat.
-- Every operation is one JSON-RPC `tools/call` to the MCP server (`nodes/Rollstack/transport.ts`), signed with the
-  credential's API key. The node is programmatic because that call, its event-stream answers, retries with the same
-  idempotency key and held confirmations don't fit declarative routing.
+  scope, which an owner or admin of the organization creates. Never ask for a key in the chat. With `-- --rest-only`
+  it refreshes only `rest.json`, each tool's REST method and path, from the OpenAPI document, with no key.
+- Every operation is one request to Rollstack's REST API (`nodes/Rollstack/transport.ts`), signed with the
+  credential's API key. Never call Rollstack's MCP server from the node: n8n's scanner rejects a node that speaks MCP
+  (`@n8n/community-nodes/no-mcp-protocol-client`), since n8n has its own MCP Client node. With an API key, the REST API
+  runs calls that email people or delete reports at once, without asking anyone to confirm them.
+- Before a release, run n8n's latest scanner on the folder: `npx -y @n8n/scan-community-package@latest .`. The linter
+  in `@n8n/node-cli` can lag behind it.
 - The node's description, `package.json`'s description and the README's opening line are Rollstack's listing line:
   "Build polished presentations using AI, with advanced charts and data connections built in." Keep them the same.
 - `eslint.config.mjs` must stay n8n's default config, and `package.json` must keep `"strict": true` and no run-time

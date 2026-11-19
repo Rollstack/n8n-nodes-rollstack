@@ -1,6 +1,6 @@
 {
 	"name": "@rollstack/n8n-nodes-rollstack",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Build polished presentations using AI, with advanced charts and data connections built in.",
 	"license": "MIT",
 	"homepage": "https://www.rollstack.com",
