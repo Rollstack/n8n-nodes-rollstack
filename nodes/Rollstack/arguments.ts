@@ -24,7 +24,11 @@ function parseJson(text: string): { value: unknown } | undefined {
 
 /** A parameter's value as the Rollstack tool takes it. A value of undefined means the input is left out. */
 export function convert(input: ToolInput, value: unknown): Converted {
-	if (input.nullable === true && typeof value === 'string' && value.trim() === 'null')
+	// null from an expression, or the text null, sends null to an input that takes it
+	if (
+		input.nullable === true &&
+		(value === null || (typeof value === 'string' && value.trim() === 'null'))
+	)
 		return { value: null };
 	switch (input.kind) {
 		case 'list': {
@@ -47,11 +51,21 @@ export function convert(input: ToolInput, value: unknown): Converted {
 		case 'json': {
 			if (isEmpty(value)) return { value: undefined };
 			if (typeof value !== 'string') return { value };
-			return parseJson(value) ?? { problem: 'enter valid JSON' };
+			const parsed = parseJson(value);
+			if (!parsed) return { problem: 'enter valid JSON' };
+			// A nullable input took null above
+			if (parsed.value === null) return { problem: 'enter a value other than null' };
+			return parsed;
 		}
 		case 'integer':
-		case 'number':
-			return { value: isEmpty(value) ? undefined : Number(value) };
+		case 'number': {
+			if (isEmpty(value)) return { value: undefined };
+			const number = Number(value);
+			if (!Number.isFinite(number)) return { problem: 'enter a number' };
+			if (input.kind === 'integer' && !Number.isInteger(number))
+				return { problem: 'enter a whole number' };
+			return { value: number };
+		}
 		case 'boolean':
 			return { value: typeof value === 'string' ? value === 'true' : Boolean(value) };
 		default:

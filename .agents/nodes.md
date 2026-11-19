@@ -22,7 +22,10 @@ Nodes have `description` which defines:
 - `inputs`, `outputs`
 - `properties`
 - Optional `subtitle`, `usableAsTool`, etc
-and an optional `execute` function for programmatic-style nodes.
+
+Programmatic-style nodes also need an `execute` method. It goes on the node
+class next to `description`, not inside `description`. Declarative-style
+nodes have none.
 
 Example node description (simplified, using WordPress **only as an
 example**):

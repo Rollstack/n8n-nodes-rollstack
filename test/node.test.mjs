@@ -48,6 +48,7 @@ test('slide images come back as binary data', async () => {
 	assert.deepEqual(item.json, { slides: [{ id: 's1' }] });
 	assert.equal(item.binary.image1.mimeType, 'image/png');
 	assert.equal(item.binary.image1.fileName, 'getReportSlideImages-1.png');
+	assert.equal(item.binary.image1.data, Buffer.from('png').toString('base64'));
 });
 
 test("an error keeps Rollstack's message and HTTP code, and the item it failed on", async () => {

@@ -79,6 +79,8 @@ if (missing.length) {
 	);
 	process.exit(1);
 }
+// Fetched before either file is written, so a failure leaves both as they were
+const byTool = await groups(tools);
 writeFileSync(TOOLS, `${JSON.stringify({ source: `${MCP_URL} (tools/list)`, tools }, null, 2)}\n`);
-writeFileSync(GROUPS, `${JSON.stringify(await groups(tools), null, 2)}\n`);
+writeFileSync(GROUPS, `${JSON.stringify(byTool, null, 2)}\n`);
 console.log(`Saved ${tools.length} tools. Now run npm run generate.`);

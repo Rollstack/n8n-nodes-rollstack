@@ -27,6 +27,20 @@ test('a structured input takes JSON text or a value', () => {
 test('null is sent only to an input that takes it', () => {
 	assert.deepEqual(convert({ ...list, nullable: true }, 'null'), { value: null });
 	assert.deepEqual(convert(list, 'null'), { value: ['null'] });
+	// An expression that comes out as null
+	assert.deepEqual(convert({ ...structured, nullable: true }, null), { value: null });
+	assert.deepEqual(convert(structured, null), { value: undefined });
+	assert.ok('problem' in convert(structured, 'null'));
+});
+
+test('a number that cannot be read, or a fraction for a whole number, is a problem', () => {
+	const integer = { name: 'limit', part: 'query', kind: 'integer', required: false };
+	const number = { name: 'x', part: 'body', kind: 'number', required: false };
+	assert.ok('problem' in convert(integer, 'abc'));
+	assert.ok('problem' in convert(integer, 2.5));
+	assert.ok('problem' in convert(number, 'Infinity'));
+	assert.deepEqual(convert(number, '2.5'), { value: 2.5 });
+	assert.deepEqual(convert(integer, '20'), { value: 20 });
 });
 
 test('numbers and booleans', () => {

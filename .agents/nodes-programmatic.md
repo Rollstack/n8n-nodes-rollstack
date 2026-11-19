@@ -51,9 +51,10 @@ async execute(
 
       // Implement a check to see what error we have
       const isApiError = true;
-      // Use NodeApiError for API-related errors
+      // Use NodeApiError for API-related errors. It takes the error as a
+      // JsonObject (a type from n8n-workflow), not as an Error
       if (isApiError) {
-        throw new NodeApiError(this.getNode(), error as Error, { itemIndex: i });
+        throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
       }
 
       // Use NodeOperationError for configuration/validation errors

@@ -42,6 +42,11 @@ test('every required input has a parameter of its own, shown for its operation o
 			);
 			assert.equal(found.length, 1, `${operation}: ${name}`);
 			assert.equal(found[0].required, true, `${operation}: ${name}`);
+			assert.deepEqual(
+				found[0].displayOptions.show.operation,
+				[operation],
+				`${operation}: ${name}`,
+			);
 		}
 	}
 });
@@ -61,6 +66,8 @@ test('every optional input is under Additional Fields', () => {
 			optional.sort(),
 			operation,
 		);
+		if (collection)
+			assert.deepEqual(collection.displayOptions.show.operation, [operation], operation);
 	}
 });
 

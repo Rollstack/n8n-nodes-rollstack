@@ -162,13 +162,18 @@ can change:
   },
 }
 ```
-Node class:
+Node class, which registers the method under `methods.resourceMapping` so
+that n8n finds it by the name `resourceMapperMethod` gives:
 ```typescript
-export async function getToolParameters(
-  this: ILoadOptionsFunctions,
-): Promise<ResourceMapperFields> {
-  // Implementation omitted; build fields based on the external tool
-  return { fields: [] };
-}
+methods = {
+  resourceMapping: {
+    async getToolParameters(
+      this: ILoadOptionsFunctions,
+    ): Promise<ResourceMapperFields> {
+      // Implementation omitted; build fields based on the external tool
+      return { fields: [] };
+    },
+  },
+};
 ```
 Use `resourceMapper` **only when necessary**, as it is more advanced.
