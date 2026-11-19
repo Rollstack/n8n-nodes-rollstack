@@ -1,0 +1,62 @@
+{
+	"name": "@rollstack/n8n-nodes-rollstack",
+	"version": "0.1.0",
+	"description": "Build polished presentations using AI, with advanced charts and data connections built in.",
+	"license": "MIT",
+	"homepage": "https://www.rollstack.com",
+	"bugs": "https://github.com/Rollstack/n8n-nodes-rollstack/issues",
+	"keywords": [
+		"n8n-community-node-package",
+		"rollstack",
+		"presentations",
+		"slides",
+		"charts",
+		"reporting"
+	],
+	"author": {
+		"name": "Rollstack",
+		"email": "support@rollstack.com",
+		"url": "https://www.rollstack.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Rollstack/n8n-nodes-rollstack.git"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"generate": "node scripts/generate.mjs",
+		"generate:check": "node scripts/generate.mjs --check",
+		"update-definitions": "node scripts/update-definitions.mjs",
+		"test": "n8n-node build && node --test \"test/*.test.mjs\"",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/RollstackApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Rollstack/Rollstack.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "^0.57.4",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^21.1.0",
+		"title-case": "3.0.3",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}
