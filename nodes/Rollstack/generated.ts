@@ -1,4 +1,4 @@
-// Written by scripts/generate.mjs from definitions/mcp-tools.json and definitions/groups.json: run
+// Written by scripts/generate.mjs from definitions/mcp-tools.json and definitions/rest.json: run
 // `npm run generate` rather than editing it.
 import type { INodeProperties } from 'n8n-workflow';
 import type { ToolSpec } from './types';
@@ -6,6 +6,8 @@ import type { ToolSpec } from './types';
 export const toolSpecs: Record<string, ToolSpec> = {
 	listReports: {
 		tool: 'listReports',
+		method: 'GET',
+		path: '/reports',
 		parts: [],
 		inputs: [
 			{
@@ -42,6 +44,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReport: {
 		tool: 'getReport',
+		method: 'GET',
+		path: '/reports/{id}',
 		parts: [
 			'params',
 		],
@@ -56,6 +60,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	convertReport: {
 		tool: 'convertReport',
+		method: 'POST',
+		path: '/reports/{id}/conversions',
 		parts: [
 			'params',
 		],
@@ -88,6 +94,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createReport: {
 		tool: 'createReport',
+		method: 'POST',
+		path: '/reports',
 		parts: [
 			'body',
 		],
@@ -132,6 +140,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	duplicateReport: {
 		tool: 'duplicateReport',
+		method: 'POST',
+		path: '/reports/{id}/duplicates',
 		parts: [
 			'params',
 			'body',
@@ -177,6 +187,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReport: {
 		tool: 'updateReport',
+		method: 'PATCH',
+		path: '/reports/{id}',
 		parts: [
 			'params',
 			'body',
@@ -229,6 +241,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	batchGetReports: {
 		tool: 'batchGetReports',
+		method: 'POST',
+		path: '/reports/batch-get',
 		parts: [
 			'body',
 		],
@@ -243,23 +257,15 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listTemplates: {
 		tool: 'listTemplates',
+		method: 'GET',
+		path: '/templates',
 		parts: [],
 		inputs: [],
 	},
-	showTemplates: {
-		tool: 'showTemplates',
-		parts: [],
-		inputs: [
-			{
-				name: 'reportId',
-				part: 'query',
-				kind: 'text',
-				required: false,
-			},
-		],
-	},
 	createTemplate: {
 		tool: 'createTemplate',
+		method: 'POST',
+		path: '/templates',
 		parts: [
 			'body',
 		],
@@ -292,6 +298,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateTemplate: {
 		tool: 'updateTemplate',
+		method: 'PATCH',
+		path: '/templates/{templateId}',
 		parts: [
 			'params',
 			'body',
@@ -325,6 +333,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteTemplate: {
 		tool: 'deleteTemplate',
+		method: 'DELETE',
+		path: '/templates/{templateId}',
 		parts: [
 			'params',
 		],
@@ -345,6 +355,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	applyReportTemplate: {
 		tool: 'applyReportTemplate',
+		method: 'POST',
+		path: '/reports/{id}/template',
 		parts: [
 			'params',
 			'body',
@@ -372,6 +384,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportVersions: {
 		tool: 'listReportVersions',
+		method: 'GET',
+		path: '/reports/{id}/versions',
 		parts: [
 			'params',
 		],
@@ -398,6 +412,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	saveReportVersion: {
 		tool: 'saveReportVersion',
+		method: 'POST',
+		path: '/reports/{id}/versions',
 		parts: [
 			'params',
 			'body',
@@ -425,6 +441,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	restoreReportVersion: {
 		tool: 'restoreReportVersion',
+		method: 'POST',
+		path: '/reports/{id}/versions/{versionId}/restore',
 		parts: [
 			'params',
 		],
@@ -451,6 +469,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportMessage: {
 		tool: 'getReportMessage',
+		method: 'GET',
+		path: '/reports/{id}/messages/{messageId}',
 		parts: [
 			'params',
 		],
@@ -477,6 +497,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendReportMessage: {
 		tool: 'sendReportMessage',
+		method: 'POST',
+		path: '/reports/{id}/messages',
 		parts: [
 			'params',
 			'body',
@@ -534,6 +556,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	approveReportMessageProposal: {
 		tool: 'approveReportMessageProposal',
+		method: 'POST',
+		path: '/reports/{id}/messages/{messageId}/replies/{replyId}/approve',
 		parts: [
 			'params',
 		],
@@ -566,6 +590,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	cancelReportMessage: {
 		tool: 'cancelReportMessage',
+		method: 'POST',
+		path: '/reports/{id}/messages/{messageId}/cancel',
 		parts: [
 			'params',
 		],
@@ -592,6 +618,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	rejectReportMessageProposal: {
 		tool: 'rejectReportMessageProposal',
+		method: 'POST',
+		path: '/reports/{id}/messages/{messageId}/replies/{replyId}/reject',
 		parts: [
 			'params',
 		],
@@ -624,11 +652,15 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listMemories: {
 		tool: 'listMemories',
+		method: 'GET',
+		path: '/memories',
 		parts: [],
 		inputs: [],
 	},
 	createMemory: {
 		tool: 'createMemory',
+		method: 'POST',
+		path: '/memories',
 		parts: [
 			'body',
 		],
@@ -656,6 +688,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateMemory: {
 		tool: 'updateMemory',
+		method: 'PATCH',
+		path: '/memories/{memoryId}',
 		parts: [
 			'params',
 			'body',
@@ -690,6 +724,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteMemory: {
 		tool: 'deleteMemory',
+		method: 'DELETE',
+		path: '/memories/{memoryId}',
 		parts: [
 			'params',
 		],
@@ -710,6 +746,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportRuns: {
 		tool: 'listReportRuns',
+		method: 'GET',
+		path: '/reports/{id}/runs',
 		parts: [
 			'params',
 		],
@@ -736,6 +774,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportRun: {
 		tool: 'getReportRun',
+		method: 'GET',
+		path: '/reports/{id}/runs/{runId}',
 		parts: [
 			'params',
 		],
@@ -762,6 +802,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportSyncs: {
 		tool: 'listReportSyncs',
+		method: 'GET',
+		path: '/reports/{id}/syncs',
 		parts: [
 			'params',
 		],
@@ -776,6 +818,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listRuns: {
 		tool: 'listRuns',
+		method: 'GET',
+		path: '/runs',
 		parts: [],
 		inputs: [
 			{
@@ -806,6 +850,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	startReportRun: {
 		tool: 'startReportRun',
+		method: 'POST',
+		path: '/reports/{id}/runs',
 		parts: [
 			'params',
 		],
@@ -844,6 +890,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	batchStartReportRuns: {
 		tool: 'batchStartReportRuns',
+		method: 'POST',
+		path: '/reports/batch-run',
 		parts: [
 			'body',
 		],
@@ -870,6 +918,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	cancelReportRun: {
 		tool: 'cancelReportRun',
+		method: 'POST',
+		path: '/reports/{id}/runs/{runId}/cancel',
 		parts: [
 			'params',
 		],
@@ -896,6 +946,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportCloudExport: {
 		tool: 'getReportCloudExport',
+		method: 'GET',
+		path: '/reports/{id}/cloud-export',
 		parts: [
 			'params',
 		],
@@ -910,6 +962,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReportCloudExport: {
 		tool: 'updateReportCloudExport',
+		method: 'PUT',
+		path: '/reports/{id}/cloud-export',
 		parts: [
 			'params',
 			'body',
@@ -973,6 +1027,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	exportReport: {
 		tool: 'exportReport',
+		method: 'POST',
+		path: '/reports/{id}/exports',
 		parts: [
 			'params',
 			'body',
@@ -1006,6 +1062,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportContent: {
 		tool: 'getReportContent',
+		method: 'GET',
+		path: '/reports/{id}/content',
 		parts: [
 			'params',
 		],
@@ -1026,6 +1084,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportDesign: {
 		tool: 'getReportDesign',
+		method: 'GET',
+		path: '/reports/{id}/design',
 		parts: [
 			'params',
 		],
@@ -1046,6 +1106,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportSlideHtml: {
 		tool: 'getReportSlideHtml',
+		method: 'GET',
+		path: '/reports/{id}/slides/html',
 		parts: [
 			'params',
 			'query',
@@ -1067,6 +1129,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportSlideImages: {
 		tool: 'getReportSlideImages',
+		method: 'GET',
+		path: '/reports/{id}/slides/images',
 		parts: [
 			'params',
 			'query',
@@ -1086,28 +1150,10 @@ export const toolSpecs: Record<string, ToolSpec> = {
 			},
 		],
 	},
-	showReport: {
-		tool: 'showReport',
-		parts: [
-			'params',
-		],
-		inputs: [
-			{
-				name: 'id',
-				part: 'params',
-				kind: 'text',
-				required: true,
-			},
-			{
-				name: 'changedSlideIds',
-				part: 'query',
-				kind: 'list',
-				required: false,
-			},
-		],
-	},
 	arrangeReportSlides: {
 		tool: 'arrangeReportSlides',
+		method: 'PATCH',
+		path: '/reports/{id}/slides',
 		parts: [
 			'params',
 			'body',
@@ -1153,6 +1199,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReportTheme: {
 		tool: 'updateReportTheme',
+		method: 'PATCH',
+		path: '/reports/{id}/theme',
 		parts: [
 			'params',
 			'body',
@@ -1192,6 +1240,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	renderReportSlides: {
 		tool: 'renderReportSlides',
+		method: 'POST',
+		path: '/reports/{id}/slides/render',
 		parts: [
 			'params',
 			'body',
@@ -1219,6 +1269,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	saveReportSlides: {
 		tool: 'saveReportSlides',
+		method: 'POST',
+		path: '/reports/{id}/slides',
 		parts: [
 			'params',
 			'body',
@@ -1252,6 +1304,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getDataset: {
 		tool: 'getDataset',
+		method: 'GET',
+		path: '/datasets/{id}',
 		parts: [
 			'params',
 		],
@@ -1278,6 +1332,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createDatasetUpload: {
 		tool: 'createDatasetUpload',
+		method: 'POST',
+		path: '/datasets/uploads',
 		parts: [
 			'body',
 		],
@@ -1298,6 +1354,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createDocument: {
 		tool: 'createDocument',
+		method: 'POST',
+		path: '/documents',
 		parts: [
 			'body',
 		],
@@ -1324,6 +1382,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createDataset: {
 		tool: 'createDataset',
+		method: 'POST',
+		path: '/datasets',
 		parts: [
 			'body',
 		],
@@ -1350,6 +1410,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	replaceDataset: {
 		tool: 'replaceDataset',
+		method: 'PUT',
+		path: '/datasets/{id}',
 		parts: [
 			'params',
 			'body',
@@ -1377,6 +1439,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteDataset: {
 		tool: 'deleteDataset',
+		method: 'DELETE',
+		path: '/datasets/{id}',
 		parts: [
 			'params',
 		],
@@ -1397,11 +1461,15 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportDataGuide: {
 		tool: 'getReportDataGuide',
+		method: 'GET',
+		path: '/data-guide',
 		parts: [],
 		inputs: [],
 	},
 	listReportDatasheets: {
 		tool: 'listReportDatasheets',
+		method: 'GET',
+		path: '/reports/{id}/datasheets',
 		parts: [
 			'params',
 		],
@@ -1416,6 +1484,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportDatasheet: {
 		tool: 'getReportDatasheet',
+		method: 'GET',
+		path: '/reports/{id}/datasheets/{datasheetId}',
 		parts: [
 			'params',
 		],
@@ -1436,6 +1506,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportDatasheetData: {
 		tool: 'getReportDatasheetData',
+		method: 'GET',
+		path: '/reports/{id}/datasheets/{datasheetId}/data',
 		parts: [
 			'params',
 		],
@@ -1462,6 +1534,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	addReportDatasheets: {
 		tool: 'addReportDatasheets',
+		method: 'POST',
+		path: '/reports/{id}/datasheets',
 		parts: [
 			'params',
 			'body',
@@ -1489,6 +1563,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	removeReportDatasheet: {
 		tool: 'removeReportDatasheet',
+		method: 'DELETE',
+		path: '/reports/{id}/datasheets/{datasheetId}',
 		parts: [
 			'params',
 		],
@@ -1515,6 +1591,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	addReportDashboardElements: {
 		tool: 'addReportDashboardElements',
+		method: 'POST',
+		path: '/reports/{id}/datasheets/{datasheetId}/elements',
 		parts: [
 			'params',
 			'body',
@@ -1548,6 +1626,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	previewReportDatasheetChanges: {
 		tool: 'previewReportDatasheetChanges',
+		method: 'POST',
+		path: '/reports/{id}/datasheets/changes/preview',
 		parts: [
 			'params',
 			'body',
@@ -1569,6 +1649,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	queryReportData: {
 		tool: 'queryReportData',
+		method: 'POST',
+		path: '/reports/{id}/data/query',
 		parts: [
 			'params',
 			'body',
@@ -1590,6 +1672,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	saveReportDatasheetChanges: {
 		tool: 'saveReportDatasheetChanges',
+		method: 'POST',
+		path: '/reports/{id}/datasheets/changes',
 		parts: [
 			'params',
 			'body',
@@ -1623,6 +1707,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportParameters: {
 		tool: 'getReportParameters',
+		method: 'GET',
+		path: '/reports/{id}/parameters',
 		parts: [
 			'params',
 		],
@@ -1637,6 +1723,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createReportParameter: {
 		tool: 'createReportParameter',
+		method: 'POST',
+		path: '/reports/{id}/parameters',
 		parts: [
 			'params',
 			'body',
@@ -1683,6 +1771,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReportParameter: {
 		tool: 'updateReportParameter',
+		method: 'PATCH',
+		path: '/reports/{id}/parameters/{parameterId}',
 		parts: [
 			'params',
 			'body',
@@ -1735,6 +1825,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteReportParameter: {
 		tool: 'deleteReportParameter',
+		method: 'DELETE',
+		path: '/reports/{id}/parameters/{parameterId}',
 		parts: [
 			'params',
 		],
@@ -1761,6 +1853,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportViews: {
 		tool: 'getReportViews',
+		method: 'GET',
+		path: '/reports/{id}/views',
 		parts: [
 			'params',
 		],
@@ -1775,6 +1869,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	shareReport: {
 		tool: 'shareReport',
+		method: 'PUT',
+		path: '/reports/{id}/shares/{userId}',
 		parts: [
 			'params',
 			'body',
@@ -1808,6 +1904,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	unshareReport: {
 		tool: 'unshareReport',
+		method: 'DELETE',
+		path: '/reports/{id}/shares/{userId}',
 		parts: [
 			'params',
 		],
@@ -1834,6 +1932,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	batchShareReports: {
 		tool: 'batchShareReports',
+		method: 'POST',
+		path: '/reports/batch-share',
 		parts: [
 			'body',
 		],
@@ -1866,6 +1966,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportComments: {
 		tool: 'listReportComments',
+		method: 'GET',
+		path: '/reports/{id}/comments',
 		parts: [
 			'params',
 		],
@@ -1880,6 +1982,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createReportComment: {
 		tool: 'createReportComment',
+		method: 'POST',
+		path: '/reports/{id}/comments',
 		parts: [
 			'params',
 			'body',
@@ -1919,6 +2023,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	resolveReportComment: {
 		tool: 'resolveReportComment',
+		method: 'POST',
+		path: '/reports/{id}/comments/{commentId}/resolve',
 		parts: [
 			'params',
 			'body',
@@ -1952,6 +2058,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportSchedules: {
 		tool: 'getReportSchedules',
+		method: 'GET',
+		path: '/reports/{id}/schedules',
 		parts: [
 			'params',
 		],
@@ -1966,6 +2074,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReportSchedules: {
 		tool: 'updateReportSchedules',
+		method: 'PUT',
+		path: '/reports/{id}/schedules',
 		parts: [
 			'params',
 			'body',
@@ -1993,6 +2103,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	batchUpdateReportSchedules: {
 		tool: 'batchUpdateReportSchedules',
+		method: 'POST',
+		path: '/reports/batch-update-schedules',
 		parts: [
 			'body',
 		],
@@ -2019,6 +2131,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listEmails: {
 		tool: 'listEmails',
+		method: 'GET',
+		path: '/emails',
 		parts: [],
 		inputs: [
 			{
@@ -2055,6 +2169,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getReportEmailConfig: {
 		tool: 'getReportEmailConfig',
+		method: 'GET',
+		path: '/reports/{id}/email-config',
 		parts: [
 			'params',
 		],
@@ -2069,6 +2185,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportEmails: {
 		tool: 'listReportEmails',
+		method: 'GET',
+		path: '/reports/{id}/emails',
 		parts: [
 			'params',
 		],
@@ -2095,6 +2213,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateReportEmailConfig: {
 		tool: 'updateReportEmailConfig',
+		method: 'PUT',
+		path: '/reports/{id}/email-config',
 		parts: [
 			'params',
 			'body',
@@ -2183,6 +2303,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendReportEmail: {
 		tool: 'sendReportEmail',
+		method: 'POST',
+		path: '/reports/{id}/emails',
 		parts: [
 			'params',
 		],
@@ -2203,6 +2325,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendReportTestEmail: {
 		tool: 'sendReportTestEmail',
+		method: 'POST',
+		path: '/reports/{id}/emails/test',
 		parts: [
 			'params',
 		],
@@ -2223,6 +2347,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listBursts: {
 		tool: 'listBursts',
+		method: 'GET',
+		path: '/bursts',
 		parts: [],
 		inputs: [
 			{
@@ -2247,6 +2373,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listBurstEmailConfigs: {
 		tool: 'listBurstEmailConfigs',
+		method: 'GET',
+		path: '/bursts/{id}/email-configs',
 		parts: [
 			'params',
 		],
@@ -2261,6 +2389,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getBurstRun: {
 		tool: 'getBurstRun',
+		method: 'GET',
+		path: '/bursts/{id}/runs',
 		parts: [
 			'params',
 		],
@@ -2281,6 +2411,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getBurstSettings: {
 		tool: 'getBurstSettings',
+		method: 'GET',
+		path: '/bursts/{id}/settings',
 		parts: [
 			'params',
 		],
@@ -2295,6 +2427,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listBurstVariants: {
 		tool: 'listBurstVariants',
+		method: 'GET',
+		path: '/bursts/{id}/variants',
 		parts: [
 			'params',
 		],
@@ -2321,6 +2455,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getBurstVariantBatch: {
 		tool: 'getBurstVariantBatch',
+		method: 'GET',
+		path: '/bursts/{id}/variants/batches/{batchId}',
 		parts: [
 			'params',
 		],
@@ -2347,6 +2483,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listReportSyncFilters: {
 		tool: 'listReportSyncFilters',
+		method: 'GET',
+		path: '/reports/{id}/syncs/{syncId}/filters',
 		parts: [
 			'params',
 		],
@@ -2367,6 +2505,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	addBurstVariants: {
 		tool: 'addBurstVariants',
+		method: 'POST',
+		path: '/bursts/{id}/variants',
 		parts: [
 			'params',
 			'body',
@@ -2394,6 +2534,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	convertBurst: {
 		tool: 'convertBurst',
+		method: 'POST',
+		path: '/bursts/{id}/conversions',
 		parts: [
 			'params',
 		],
@@ -2426,6 +2568,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createBurst: {
 		tool: 'createBurst',
+		method: 'POST',
+		path: '/bursts',
 		parts: [
 			'body',
 		],
@@ -2476,6 +2620,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createBurstEmailConfig: {
 		tool: 'createBurstEmailConfig',
+		method: 'POST',
+		path: '/bursts/{id}/email-configs',
 		parts: [
 			'params',
 			'body',
@@ -2565,6 +2711,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	startBurstRun: {
 		tool: 'startBurstRun',
+		method: 'POST',
+		path: '/bursts/{id}/runs',
 		parts: [
 			'params',
 		],
@@ -2591,6 +2739,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendBurstEmailConfig: {
 		tool: 'sendBurstEmailConfig',
+		method: 'POST',
+		path: '/bursts/{id}/email-configs/{configId}/send',
 		parts: [
 			'params',
 		],
@@ -2617,6 +2767,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendBurstVariantEmails: {
 		tool: 'sendBurstVariantEmails',
+		method: 'POST',
+		path: '/bursts/{id}/variants/emails',
 		parts: [
 			'params',
 		],
@@ -2643,6 +2795,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	renameBurst: {
 		tool: 'renameBurst',
+		method: 'PATCH',
+		path: '/bursts/{id}',
 		parts: [
 			'params',
 			'body',
@@ -2682,6 +2836,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateBurstVariantEmailSettings: {
 		tool: 'updateBurstVariantEmailSettings',
+		method: 'PATCH',
+		path: '/bursts/{id}/variants/email-settings',
 		parts: [
 			'params',
 			'body',
@@ -2752,6 +2908,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateBurstEmailConfig: {
 		tool: 'updateBurstEmailConfig',
+		method: 'PATCH',
+		path: '/bursts/{id}/email-configs/{configId}',
 		parts: [
 			'params',
 			'body',
@@ -2847,6 +3005,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateBurstSettings: {
 		tool: 'updateBurstSettings',
+		method: 'PATCH',
+		path: '/bursts/{id}/settings',
 		parts: [
 			'params',
 			'body',
@@ -2904,6 +3064,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateBurstVariantRecipients: {
 		tool: 'updateBurstVariantRecipients',
+		method: 'PUT',
+		path: '/bursts/{id}/variants/recipients',
 		parts: [
 			'params',
 			'body',
@@ -2931,6 +3093,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateBurstFilters: {
 		tool: 'updateBurstFilters',
+		method: 'PUT',
+		path: '/bursts/{id}/filters',
 		parts: [
 			'params',
 			'body',
@@ -2970,6 +3134,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteBurst: {
 		tool: 'deleteBurst',
+		method: 'DELETE',
+		path: '/bursts/{id}',
 		parts: [
 			'params',
 		],
@@ -2990,6 +3156,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	deleteBurstEmailConfig: {
 		tool: 'deleteBurstEmailConfig',
+		method: 'DELETE',
+		path: '/bursts/{id}/email-configs/{configId}',
 		parts: [
 			'params',
 		],
@@ -3016,6 +3184,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	reapplyBurstFilters: {
 		tool: 'reapplyBurstFilters',
+		method: 'POST',
+		path: '/bursts/{id}/filters/reapply',
 		parts: [
 			'params',
 		],
@@ -3042,6 +3212,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	removeBurstVariants: {
 		tool: 'removeBurstVariants',
+		method: 'POST',
+		path: '/bursts/{id}/variants/remove',
 		parts: [
 			'params',
 			'body',
@@ -3069,6 +3241,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	sendBurstEmailConfigTest: {
 		tool: 'sendBurstEmailConfigTest',
+		method: 'POST',
+		path: '/bursts/{id}/email-configs/{configId}/test',
 		parts: [
 			'params',
 		],
@@ -3095,11 +3269,15 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listConnections: {
 		tool: 'listConnections',
+		method: 'GET',
+		path: '/connections',
 		parts: [],
 		inputs: [],
 	},
 	searchDashboards: {
 		tool: 'searchDashboards',
+		method: 'GET',
+		path: '/connections/{type}/{id}/dashboards',
 		parts: [
 			'params',
 		],
@@ -3126,6 +3304,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getDashboard: {
 		tool: 'getDashboard',
+		method: 'GET',
+		path: '/connections/{type}/{id}/dashboards/{dashboardId}',
 		parts: [
 			'params',
 		],
@@ -3158,6 +3338,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	searchModels: {
 		tool: 'searchModels',
+		method: 'GET',
+		path: '/connections/{type}/{id}/models',
 		parts: [
 			'params',
 		],
@@ -3184,6 +3366,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	searchTables: {
 		tool: 'searchTables',
+		method: 'GET',
+		path: '/connections/{type}/{id}/tables',
 		parts: [
 			'params',
 		],
@@ -3210,6 +3394,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	searchSpreadsheets: {
 		tool: 'searchSpreadsheets',
+		method: 'GET',
+		path: '/spreadsheets',
 		parts: [],
 		inputs: [
 			{
@@ -3222,6 +3408,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	getSpreadsheet: {
 		tool: 'getSpreadsheet',
+		method: 'GET',
+		path: '/spreadsheets/{id}',
 		parts: [
 			'params',
 		],
@@ -3236,16 +3424,22 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	listSmtpConnections: {
 		tool: 'listSmtpConnections',
+		method: 'GET',
+		path: '/smtp-connections',
 		parts: [],
 		inputs: [],
 	},
 	listFolders: {
 		tool: 'listFolders',
+		method: 'GET',
+		path: '/folders',
 		parts: [],
 		inputs: [],
 	},
 	getFolder: {
 		tool: 'getFolder',
+		method: 'GET',
+		path: '/folders/{id}',
 		parts: [
 			'params',
 		],
@@ -3260,6 +3454,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	createFolder: {
 		tool: 'createFolder',
+		method: 'POST',
+		path: '/folders',
 		parts: [
 			'body',
 		],
@@ -3287,6 +3483,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	updateFolder: {
 		tool: 'updateFolder',
+		method: 'PATCH',
+		path: '/folders/{id}',
 		parts: [
 			'params',
 			'body',
@@ -3321,6 +3519,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	shareFolder: {
 		tool: 'shareFolder',
+		method: 'PUT',
+		path: '/folders/{id}/shares/{userId}',
 		parts: [
 			'params',
 			'body',
@@ -3354,6 +3554,8 @@ export const toolSpecs: Record<string, ToolSpec> = {
 	},
 	unshareFolder: {
 		tool: 'unshareFolder',
+		method: 'DELETE',
+		path: '/folders/{id}/shares/{userId}',
 		parts: [
 			'params',
 		],
@@ -3378,34 +3580,10 @@ export const toolSpecs: Record<string, ToolSpec> = {
 			},
 		],
 	},
-	submitFeedback: {
-		tool: 'submitFeedback',
-		parts: [
-			'body',
-		],
-		inputs: [
-			{
-				name: 'message',
-				part: 'body',
-				kind: 'text',
-				required: true,
-			},
-			{
-				name: 'operationId',
-				part: 'body',
-				kind: 'text',
-				required: false,
-			},
-			{
-				name: 'idempotencyKey',
-				part: '',
-				kind: 'text',
-				required: false,
-			},
-		],
-	},
 	listMembers: {
 		tool: 'listMembers',
+		method: 'GET',
+		path: '/members',
 		parts: [],
 		inputs: [
 			{
@@ -3462,10 +3640,6 @@ export const properties: INodeProperties[] = [
 			{
 				name: 'Export',
 				value: 'export',
-			},
-			{
-				name: 'Feedback',
-				value: 'feedback',
 			},
 			{
 				name: 'Folder',
@@ -3616,12 +3790,6 @@ export const properties: INodeProperties[] = [
 				value: 'listTemplates',
 				description: 'The templates the user can build a slide deck in: their company\'s, with who imported each and whether it is shared with the organization, then Rollstack\'s own',
 				action: 'List templates',
-			},
-			{
-				name: 'Show',
-				value: 'showTemplates',
-				description: 'Shows the user the templates they can build a slide deck in, each with a preview of its look, when the client can show a picker',
-				action: 'Show templates',
 			},
 			{
 				name: 'Update',
@@ -3904,12 +4072,6 @@ export const properties: INodeProperties[] = [
 				value: 'saveReportSlides',
 				description: 'Writes slides you wrote as HTML into a slide deck, as the slides agent\'s are: a draft sent under the ID of a slide of the report replaces that slide where it is, any other is added right after the slide named in afterSlideId, or at the end without one, and every other slide stays',
 				action: 'Save draft slides',
-			},
-			{
-				name: 'Show Report',
-				value: 'showReport',
-				description: 'Shows a report to the user in a viewer with every visible slide, when the client can show one, to browse it or review the slides the slides agent changed: pass the replies\' changedSlideIds to open on the first of them and mark them all',
-				action: 'Show report',
 			},
 		],
 		default: 'getReportContent',
@@ -4564,28 +4726,6 @@ export const properties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'feedback',
-				],
-			},
-		},
-		options: [
-			{
-				name: 'Send',
-				value: 'submitFeedback',
-				description: 'Tells the Rollstack team about something the user asked for that you couldn\'t do: a tool or endpoint that is missing, a call that was refused or failed, or a task nothing covers',
-				action: 'Send feedback',
-			},
-		],
-		default: 'submitFeedback',
-	},
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: [
 					'member',
 				],
 			},
@@ -5189,55 +5329,6 @@ export const properties: INodeProperties[] = [
 				],
 			},
 		},
-	},
-	{
-		displayName: 'Tool Description',
-		name: 'toolDescription',
-		type: 'string',
-		typeOptions: {
-			rows: 4,
-		},
-		default: 'Shows the user the templates they can build a slide deck in, each with a preview of its look, when the client can show a picker. Pass reportId when they pick one for an existing report: each template then warns about the report\'s slides it has no layout for. The template the user picks reaches you with their next message: then apply it with "Apply template", or start a report in it with "Create report"\'s templateId, as they ask. Answers the templates as "List templates" does, for clients that can\'t show the picker.',
-		description: 'What the agent reads to decide when and how to use this tool. It starts as Rollstack\'s description of the operation, which you can change.',
-		displayOptions: {
-			show: {
-				'@tool': [
-					true,
-				],
-				resource: [
-					'template',
-				],
-				operation: [
-					'showTemplates',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: [
-					'template',
-				],
-				operation: [
-					'showTemplates',
-				],
-			},
-		},
-		options: [
-			{
-				displayName: 'Report ID',
-				name: 'reportId',
-				type: 'string',
-				default: '',
-				description: 'The report the user picks a template for, by its ID from listReports: the picker warns about the slides each template has no layout for. Its type must be SlideDeck, and you need edit access to it. Leave it out when the user picks one for a new report.',
-			},
-		],
 	},
 	{
 		displayName: 'Tool Description',
@@ -7675,73 +7766,6 @@ export const properties: INodeProperties[] = [
 				],
 			},
 		},
-	},
-	{
-		displayName: 'Tool Description',
-		name: 'toolDescription',
-		type: 'string',
-		typeOptions: {
-			rows: 4,
-		},
-		default: 'Shows a report to the user in a viewer with every visible slide, when the client can show one, to browse it or review the slides the slides agent changed: pass the replies\' changedSlideIds to open on the first of them and mark them all. Answers the slides\' ids and titles. Clients that can\'t show the viewer can look at the slides with "Get slide images" instead.',
-		description: 'What the agent reads to decide when and how to use this tool. It starts as Rollstack\'s description of the operation, which you can change.',
-		displayOptions: {
-			show: {
-				'@tool': [
-					true,
-				],
-				resource: [
-					'content',
-				],
-				operation: [
-					'showReport',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Report ID',
-		name: 'id',
-		required: true,
-		type: 'string',
-		default: '',
-		description: 'The report to act on, by its ID from listReports or createReport. Only reports whose type is SlideDeck work here: another type, such as a Google Slides presentation, returns 400. You can also copy it from the report\'s link in Rollstack: it\'s the part right after /slides/.',
-		displayOptions: {
-			show: {
-				resource: [
-					'content',
-				],
-				operation: [
-					'showReport',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: [
-					'content',
-				],
-				operation: [
-					'showReport',
-				],
-			},
-		},
-		options: [
-			{
-				displayName: 'Changed Slide IDs',
-				name: 'changedSlideIds',
-				type: 'string',
-				default: '',
-				description: 'The slides the slides agent changed, from the replies\' changedSlideIds, to open on the first of them and mark them all. Leave it out, or pass an empty list, to browse the report from its first slide. Separate several with commas, or enter a JSON array.',
-			},
-		],
 	},
 	{
 		displayName: 'Tool Description',
@@ -14263,80 +14287,6 @@ export const properties: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				description: 'A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call\'s result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.',
-			},
-		],
-	},
-	{
-		displayName: 'Tool Description',
-		name: 'toolDescription',
-		type: 'string',
-		typeOptions: {
-			rows: 4,
-		},
-		default: 'Tells the Rollstack team about something the user asked for that you couldn\'t do: a tool or endpoint that is missing, a call that was refused or failed, or a task nothing covers. Send it only after the user agrees: tell them what you couldn\'t do, offer to report it, and show what you\'d send. The team reads every message to decide what to build next; it doesn\'t answer, and it doesn\'t fix the problem for the user.',
-		description: 'What the agent reads to decide when and how to use this tool. It starts as Rollstack\'s description of the operation, which you can change.',
-		displayOptions: {
-			show: {
-				'@tool': [
-					true,
-				],
-				resource: [
-					'feedback',
-				],
-				operation: [
-					'submitFeedback',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Message',
-		name: 'message',
-		required: true,
-		type: 'string',
-		default: '',
-		description: 'What the user wanted, what you tried, and what was missing or blocked you, in a few sentences. Name the tools you called and the errors they answered. Leave out credentials and personal data.',
-		displayOptions: {
-			show: {
-				resource: [
-					'feedback',
-				],
-				operation: [
-					'submitFeedback',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: [
-					'feedback',
-				],
-				operation: [
-					'submitFeedback',
-				],
-			},
-		},
-		options: [
-			{
-				displayName: 'Idempotency Key',
-				name: 'idempotencyKey',
-				type: 'string',
-				default: '',
-				description: 'A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call\'s result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.',
-			},
-			{
-				displayName: 'Operation ID',
-				name: 'operationId',
-				type: 'string',
-				default: '',
-				description: 'The tool or operation that refused, failed or fell short, if one did',
 			},
 		],
 	},

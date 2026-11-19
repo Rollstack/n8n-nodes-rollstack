@@ -51,8 +51,3 @@ export function json(status, body, headers = {}) {
 		body: typeof body === 'string' ? body : JSON.stringify(body),
 	};
 }
-
-/** A tools/call answer, echoing the id of the request it answers. */
-export function toolAnswer(result, status = 200) {
-	return (options) => json(status, { jsonrpc: '2.0', id: options.body.id, result });
-}

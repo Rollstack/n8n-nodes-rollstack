@@ -1,10 +1,11 @@
 // Writes the node's resources, operations and parameters from Rollstack's tool definitions.
 //
-// It reads definitions/mcp-tools.json (every tool Rollstack's MCP server lists) and definitions/groups.json (the part
-// of Rollstack's API each tool belongs to), which `npm run update-definitions` refreshes, and writes:
+// It reads definitions/mcp-tools.json (every tool Rollstack's MCP server lists, with its inputs and description) and
+// definitions/rest.json (the REST endpoint each tool calls, and the part of Rollstack's API it belongs to), which
+// `npm run update-definitions` refreshes, and writes:
 //
 // - nodes/Rollstack/generated.ts: the node's properties, one operation per Rollstack tool, and how each operation's
-//   parameters map onto the tool's arguments;
+//   parameters map onto its REST endpoint's path, query and body;
 // - the tables of operations and of the operations that email people or delete something, in README.md.
 //
 // Run it with `npm run generate`. `npm run generate:check` writes nothing and fails when the files differ from what it
@@ -18,20 +19,13 @@ import { titleCase as lintTitleCase } from 'title-case';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TOOLS = join(ROOT, 'definitions', 'mcp-tools.json');
-const GROUPS = join(ROOT, 'definitions', 'groups.json');
+const REST = join(ROOT, 'definitions', 'rest.json');
 const OUTPUT = join(ROOT, 'nodes', 'Rollstack', 'generated.ts');
 const README = join(ROOT, 'README.md');
 
-// Tools the server lists that the node leaves out, and why. Each is called by a view Rollstack's server shows in
-// clients that support MCP Apps, never by a model or a workflow, and n8n shows no such view
+// Tools the server lists that the node leaves out, and why: those only Rollstack's MCP server has, and those only a view
+// it shows in clients that support MCP Apps calls
 const EXCLUDED = JSON.parse(readFileSync(join(ROOT, 'definitions', 'excluded.json'), 'utf8'));
-
-// The group of a tool that Rollstack's OpenAPI document doesn't describe, because only its MCP server has it
-const EXTRA_GROUPS = {
-	showReport: 'Content',
-	showTemplates: 'Templates',
-	submitFeedback: 'Feedback',
-};
 
 // The n8n resource each group of Rollstack's API becomes: singular, in title case
 const RESOURCES = {
@@ -43,7 +37,6 @@ const RESOURCES = {
 	Datasheets: 'Datasheet',
 	Email: 'Email',
 	Exports: 'Export',
-	Feedback: 'Feedback',
 	Folders: 'Folder',
 	Members: 'Member',
 	Memories: 'Memory',
@@ -59,39 +52,39 @@ const RESOURCES = {
 	Versions: 'Version',
 };
 
-// The operations that email people or delete or remove something, and whether Rollstack holds the call until the
-// user confirms it in Rollstack. Read from each tool's description on 2026-11-18, as for Rollstack's Dify plugin
-const EMAILS_OR_DELETES = {
-	approveReportMessageProposal: 'When it sends an email',
-	startReportRun: 'When the run would email the report',
-	batchStartReportRuns: 'When a run would email a report',
-	sendReportEmail: 'Yes',
-	startBurstRun: 'When a run would email a variant',
-	sendBurstEmailConfig: 'Yes',
-	sendBurstVariantEmails: 'Yes',
-	deleteBurst: 'Yes',
-	removeBurstVariants: 'Yes',
-	shareReport: 'No: the member gets an email',
-	batchShareReports: 'No: each member gets an email',
-	shareFolder: 'No: a member new to the folder gets an email',
-	sendReportTestEmail: 'No: it goes to you alone',
-	sendBurstEmailConfigTest: 'No: it goes to you alone',
-	deleteTemplate: 'No',
-	deleteMemory: 'No',
-	deleteDataset: 'No',
-	removeReportDatasheet: 'No',
-	deleteReportParameter: 'No',
-	deleteBurstEmailConfig: 'No',
-	unshareReport: 'No',
-	unshareFolder: 'No',
-	arrangeReportSlides: 'No: restoreReportVersion brings removed slides back',
-	updateReportSchedules: 'No',
-	batchUpdateReportSchedules: 'No',
-};
+// The operations that email people or delete or remove something, read from each tool's description on 2026-11-18.
+// With an API key, Rollstack's REST API runs them at once, without asking anyone to confirm them
+const EMAILS_OR_DELETES = [
+	'approveReportMessageProposal',
+	'startReportRun',
+	'batchStartReportRuns',
+	'sendReportEmail',
+	'startBurstRun',
+	'sendBurstEmailConfig',
+	'sendBurstVariantEmails',
+	'deleteBurst',
+	'removeBurstVariants',
+	'shareReport',
+	'batchShareReports',
+	'shareFolder',
+	'sendReportTestEmail',
+	'sendBurstEmailConfigTest',
+	'deleteTemplate',
+	'deleteMemory',
+	'deleteDataset',
+	'removeReportDatasheet',
+	'deleteReportParameter',
+	'deleteBurstEmailConfig',
+	'unshareReport',
+	'unshareFolder',
+	'arrangeReportSlides',
+	'updateReportSchedules',
+	'batchUpdateReportSchedules',
+];
 
-// The operation each resource opens on when you pick it: one that only reads, or for Chat and Feedback the step you
-// take first. Never one that emails people, deletes something or approves a change, which a test checks. A resource
-// missing here opens on its first operation that only reads
+// The operation each resource opens on when you pick it: one that only reads, or for Chat the step you take first.
+// Never one that emails people, deletes something or approves a change, which a test checks. A resource missing here
+// opens on its first operation that only reads
 const DEFAULT_OPERATIONS = {
 	Burst: 'listBursts',
 	Chat: 'sendReportMessage',
@@ -101,7 +94,6 @@ const DEFAULT_OPERATIONS = {
 	Datasheet: 'listReportDatasheets',
 	Email: 'getReportEmailConfig',
 	Export: 'exportReport',
-	Feedback: 'submitFeedback',
 	Folder: 'listFolders',
 	Member: 'listMembers',
 	Memory: 'listMemories',
@@ -177,14 +169,22 @@ const README_MARKS = {
 
 function load() {
 	const { tools } = JSON.parse(readFileSync(TOOLS, 'utf8'));
-	const groups = JSON.parse(readFileSync(GROUPS, 'utf8'));
-	return { tools: tools.filter((tool) => !(tool.name in EXCLUDED)), groups };
+	const { operations } = JSON.parse(readFileSync(REST, 'utf8'));
+	return { tools: tools.filter((tool) => !(tool.name in EXCLUDED)), operations };
 }
 
-function groupOf(tool, groups) {
-	const group = groups[tool.name] ?? EXTRA_GROUPS[tool.name];
-	if (!group)
-		throw new Error(`${tool.name}: no group in definitions/groups.json, and none in EXTRA_GROUPS`);
+// The REST endpoint a tool calls
+function endpointOf(tool, operations) {
+	const endpoint = operations[tool.name];
+	if (!endpoint)
+		throw new Error(
+			`${tool.name}: Rollstack's REST API has no endpoint for it in definitions/rest.json. Leave it out in definitions/excluded.json, with the reason`,
+		);
+	return endpoint;
+}
+
+function groupOf(tool, operations) {
+	const { group } = endpointOf(tool, operations);
 	if (!(group in RESOURCES))
 		throw new Error(`${tool.name}: the group "${group}" has no resource in RESOURCES`);
 	return RESOURCES[group];
@@ -489,7 +489,7 @@ function defaultOperation(resource, members) {
 		);
 	if (!members.some((tool) => tool.name === chosen))
 		throw new Error(`DEFAULT_OPERATIONS: ${resource} has no operation ${chosen}`);
-	if (chosen in EMAILS_OR_DELETES)
+	if (EMAILS_OR_DELETES.includes(chosen))
 		throw new Error(
 			`DEFAULT_OPERATIONS: ${resource} can't open on ${chosen}, which emails or deletes`,
 		);
@@ -508,10 +508,10 @@ function toolDescription(tool, actions, mentions) {
 }
 
 function build() {
-	const { tools, groups } = load();
+	const { tools, operations } = load();
 	const resources = new Map();
 	for (const tool of tools) {
-		const resource = groupOf(tool, groups);
+		const resource = groupOf(tool, operations);
 		if (!resources.has(resource)) resources.set(resource, []);
 		resources.get(resource).push(tool);
 	}
@@ -606,7 +606,8 @@ function build() {
 					options: sortByName(optional, 'displayName'),
 				});
 			const parts = PARTS.filter((part) => (tool.inputSchema.required ?? []).includes(part));
-			specs[tool.name] = { tool: tool.name, parts, inputs: mapped };
+			const { method, path } = endpointOf(tool, operations);
+			specs[tool.name] = { tool: tool.name, method, path, parts, inputs: mapped };
 		}
 	}
 	return { tools, resources, properties: [...properties, ...fields], specs };
@@ -635,7 +636,7 @@ function source(value, indent = '') {
 
 function renderTypeScript({ properties, specs }) {
 	return [
-		'// Written by scripts/generate.mjs from definitions/mcp-tools.json and definitions/groups.json: run',
+		'// Written by scripts/generate.mjs from definitions/mcp-tools.json and definitions/rest.json: run',
 		'// `npm run generate` rather than editing it.',
 		"import type { INodeProperties } from 'n8n-workflow';",
 		"import type { ToolSpec } from './types';",
@@ -663,7 +664,7 @@ function scopeOf(tool) {
 
 function renderReadme(readme, { tools, resources }) {
 	const operations = [
-		`The node has ${tools.length} operations, one for each tool of Rollstack's MCP server, under the resources of Rollstack's API reference.`,
+		`The node has ${tools.length} operations, one for each endpoint of Rollstack's REST API that Rollstack's MCP server also offers as a tool, under the resources of Rollstack's API reference.`,
 		'',
 	];
 	for (const resource of [...resources.keys()].sort((a, b) => a.localeCompare(b))) {
@@ -679,15 +680,10 @@ function renderReadme(readme, { tools, resources }) {
 			);
 		operations.push('');
 	}
-	const careful = [
-		'| Operation | What it does | Held until you confirm it in Rollstack |',
-		'| --- | --- | --- |',
-	];
+	const careful = ['| Operation | What it does |', '| --- | --- |'];
 	for (const tool of tools)
-		if (tool.name in EMAILS_OR_DELETES)
-			careful.push(
-				`| \`${tool.name}\` | ${cell(firstSentence(tool.description))} | ${EMAILS_OR_DELETES[tool.name]} |`,
-			);
+		if (EMAILS_OR_DELETES.includes(tool.name))
+			careful.push(`| \`${tool.name}\` | ${cell(firstSentence(tool.description))} |`);
 	return between(
 		between(readme, README_MARKS.operations, operations.join('\n').trimEnd()),
 		README_MARKS.careful,
@@ -704,7 +700,7 @@ function between(text, [start, end], block) {
 
 function main() {
 	const built = build();
-	const missing = Object.keys(EMAILS_OR_DELETES).filter((name) => !built.specs[name]);
+	const missing = EMAILS_OR_DELETES.filter((name) => !built.specs[name]);
 	if (missing.length)
 		throw new Error(`EMAILS_OR_DELETES names tools the node doesn't have: ${missing.join(', ')}`);
 	const files = new Map([

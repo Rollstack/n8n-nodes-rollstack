@@ -2,7 +2,7 @@
 
 This is an n8n community node for [Rollstack](https://www.rollstack.com). Build polished presentations using AI, with advanced charts and data connections built in.
 
-The Rollstack node gives a workflow, or an AI Agent as a tool, every tool of [Rollstack's MCP server](https://docs.rollstack.com/api/mcp-server): build and change slide decks with Rollstack's slides agent, connect data, refresh, schedule, export and email reports.
+The Rollstack node calls [Rollstack's REST API](https://docs.rollstack.com/api) from a workflow, or from an AI Agent as a tool: build and change slide decks with Rollstack's slides agent, connect data, refresh, schedule, export and email reports.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -30,13 +30,13 @@ The key acts as the Rollstack user who created it, in that user's organization, 
 
 ## Operations
 
-Each operation calls one tool of Rollstack's MCP server, with its name, inputs and description. Required inputs are parameters of their own; optional ones are under **Additional Fields**. An input that takes several values takes them separated by commas, or as a JSON array. A structured input takes JSON, and its description gives the JSON Schema.
+Each operation calls one endpoint of Rollstack's REST API that Rollstack's MCP server also offers as a tool, and takes that tool's inputs and description. Required inputs are parameters of their own; optional ones are under **Additional Fields**. An input that takes several values takes them separated by commas, or as a JSON array. A structured input takes JSON, and its description gives the JSON Schema.
 
 Each operation returns Rollstack's answer as one item. A list comes back with the cursor of its next page, which you pass to the same operation to get that page.
 
 <!-- operations:start -->
 
-The node has 121 operations, one for each tool of Rollstack's MCP server, under the resources of Rollstack's API reference.
+The node has 118 operations, one for each endpoint of Rollstack's REST API that Rollstack's MCP server also offers as a tool, under the resources of Rollstack's API reference.
 
 #### Burst
 
@@ -104,7 +104,6 @@ The node has 121 operations, one for each tool of Rollstack's MCP server, under 
 | Get report design | `getReportDesign` | Start here to design a slide deck's slides yourself, as HTML. | `slide_decks:read` |
 | Get slide drafts | `getReportSlideHtml` | The HTML drafts slides of a slide deck were made from, to change them and save them again with saveReportSlides under the same ids. | `slide_decks:read` |
 | Get slide images | `getReportSlideImages` | Renders slides of a report as images, as viewers see them, so you can check how they look: text that overflows or overlaps, or a chart too small to read. | `slide_decks:read` |
-| Show report | `showReport` | Shows a report to the user in a viewer with every visible slide, when the client can show one, to browse it or review the slides the slides agent changed: pass the replies' changedSlideIds to open on the first of them and mark them all. | `slide_decks:read` |
 | Arrange slides | `arrangeReportSlides` | Moves, removes, hides or shows slides of a slide deck, with nothing on them changed. | `slide_decks:write` |
 | Change theme | `updateReportTheme` | Changes a slide deck's theme: its colours, its heading font and its body font. | `slide_decks:write` |
 | Render draft slides | `renderReportSlides` | Renders slides you wrote as HTML on a slide deck's template, so you can design slides yourself instead of asking the slides agent. | `slide_decks:write` |
@@ -143,12 +142,6 @@ The node has 121 operations, one for each tool of Rollstack's MCP server, under 
 | Get cloud save | `getReportCloudExport` | Where a report is saved after its runs, in Google Drive, OneDrive or SharePoint, and how its last save went, with a link to the saved file. | `slide_decks:read` |
 | Set cloud save | `updateReportCloudExport` | Saves a report to a Google Drive, OneDrive or SharePoint folder after its runs, as the app's scheduling panel does, replacing the setting it had. | `slide_decks:write` |
 | Export report | `exportReport` | Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes. | `slide_decks:read` |
-
-#### Feedback
-
-| Operation | Rollstack tool | What it does | Scope of the key |
-| --- | --- | --- | --- |
-| Send feedback | `submitFeedback` | Tells the Rollstack team about something the user asked for that you couldn't do: a tool or endpoint that is missing, a call that was refused or failed, or a task nothing covers. | Any key |
 
 #### Folder
 
@@ -244,7 +237,6 @@ The node has 121 operations, one for each tool of Rollstack's MCP server, under 
 | Operation | Rollstack tool | What it does | Scope of the key |
 | --- | --- | --- | --- |
 | List templates | `listTemplates` | The templates the user can build a slide deck in: their company's, with who imported each and whether it is shared with the organization, then Rollstack's own. | `slide_decks:read` |
-| Show templates | `showTemplates` | Shows the user the templates they can build a slide deck in, each with a preview of its look, when the client can show a picker. | `slide_decks:read` |
 | Import template | `createTemplate` | Imports a company template from a Google Slides presentation, as the app's Templates drawer does: its theme, slide masters, layouts and slide size, not its slides. | `slide_decks:write` |
 | Update template | `updateTemplate` | Renames a company template, or shares it with the organization or stops sharing it, as the app's Templates drawer does. | `slide_decks:write` |
 | Delete template | `deleteTemplate` | Deletes a company template, as the app's Templates drawer does. | `slide_decks:write` |
@@ -296,37 +288,37 @@ Rollstack's slides agent may ask a question before it builds, or propose a chang
 
 ## Operations that email people or delete something
 
-Rollstack holds some of these calls until you confirm them in Rollstack: the operation then answers `code: confirmation-required` and the link to confirm at, instead of an error. The others act as soon as they run, so give an AI Agent only the operations it needs.
+With an API key, these act as soon as they run: Rollstack doesn't ask anyone to confirm them. Give an AI Agent only the operations it needs, and check who a workflow emails before you activate it.
 
 <!-- careful:start -->
 
-| Operation | What it does | Held until you confirm it in Rollstack |
-| --- | --- | --- |
-| `deleteTemplate` | Deletes a company template, as the app's Templates drawer does. | No |
-| `approveReportMessageProposal` | Approves the proposal of a settings_proposal or email_send_proposal reply, as its Approve button in the app's chat does: Rollstack makes the change, or sends the email. | When it sends an email |
-| `deleteMemory` | Has the slides agent forget a memory: its runs stop reading it, as forgetting it in the app's Slides settings does. | No |
-| `startReportRun` | Refreshes a report's data, or only some of its datasheets, then repairs failed calculations and the slides with AI. | When the run would email the report |
-| `batchStartReportRuns` | Starts a run of each of up to 50 reports of any type, as startReportRun does for one: each run updates its whole report, and a run of a report of another type than SlideDeck emails it when its email trigger is `all`. | When a run would email a report |
-| `arrangeReportSlides` | Moves, removes, hides or shows slides of a slide deck, with nothing on them changed. | No: restoreReportVersion brings removed slides back |
-| `deleteDataset` | Deletes an uploaded CSV file or workbook. | No |
-| `removeReportDatasheet` | Removes a datasheet the report's slides no longer show, such as a source that was added and not used, or one whose read keeps failing. | No |
-| `deleteReportParameter` | Deletes a parameter of a report, as the app's report parameters editor does. | No |
-| `shareReport` | Shares a report of any type with a member of the organization to view or edit it, or changes their permission. | No: the member gets an email |
-| `unshareReport` | Removes a user's share of a report of any type, and their access to its file when it updates one, as the app does. | No |
-| `batchShareReports` | Shares up to 50 reports of any type with the same members, with the same permission, as shareReport does for one. | No: each member gets an email |
-| `updateReportSchedules` | Replaces the schedules of a report of any type, at most 10; an empty list removes them all. | No |
-| `batchUpdateReportSchedules` | Gives up to 50 reports of any type the same schedules, replacing all of each report's current ones, as updateReportSchedules does for one; an empty list removes them all. | No |
-| `sendReportEmail` | Emails a report to its recipients now, as it is. | Yes |
-| `sendReportTestEmail` | Sends a report's email to the user only, and waits until it is sent. | No: it goes to you alone |
-| `startBurstRun` | Starts a run of every variant of a burst, or of the variants passed, as startReportRun does for each: it refreshes the variant's data, and repairs a Rollstack report's slides with AI. | When a run would email a variant |
-| `sendBurstEmailConfig` | Sends a burst's email configuration now: one email to its recipients with each variant it selects. | Yes |
-| `sendBurstVariantEmails` | Sends each variant's own email now, to its own recipients, as the app's Send does: every variant, or those passed. | Yes |
-| `deleteBurst` | Deletes a burst with every report in it, the template included, as the app does, and can't be undone. | Yes |
-| `deleteBurstEmailConfig` | Deletes a burst's email configuration. | No |
-| `removeBurstVariants` | Removes variants of a burst by their ids, and deletes their reports. | Yes |
-| `sendBurstEmailConfigTest` | Sends a burst's email configuration to you alone, to check how it looks before sending it. | No: it goes to you alone |
-| `shareFolder` | Shares a folder and everything in it with a member of the organization, or changes their permission, as Share in the app does. | No: a member new to the folder gets an email |
-| `unshareFolder` | Removes a member's direct share of a folder, and their access to its reports' files in Drive unless they still reach the folder through a parent folder, as the app does. | No |
+| Operation | What it does |
+| --- | --- |
+| `deleteTemplate` | Deletes a company template, as the app's Templates drawer does. |
+| `approveReportMessageProposal` | Approves the proposal of a settings_proposal or email_send_proposal reply, as its Approve button in the app's chat does: Rollstack makes the change, or sends the email. |
+| `deleteMemory` | Has the slides agent forget a memory: its runs stop reading it, as forgetting it in the app's Slides settings does. |
+| `startReportRun` | Refreshes a report's data, or only some of its datasheets, then repairs failed calculations and the slides with AI. |
+| `batchStartReportRuns` | Starts a run of each of up to 50 reports of any type, as startReportRun does for one: each run updates its whole report, and a run of a report of another type than SlideDeck emails it when its email trigger is `all`. |
+| `arrangeReportSlides` | Moves, removes, hides or shows slides of a slide deck, with nothing on them changed. |
+| `deleteDataset` | Deletes an uploaded CSV file or workbook. |
+| `removeReportDatasheet` | Removes a datasheet the report's slides no longer show, such as a source that was added and not used, or one whose read keeps failing. |
+| `deleteReportParameter` | Deletes a parameter of a report, as the app's report parameters editor does. |
+| `shareReport` | Shares a report of any type with a member of the organization to view or edit it, or changes their permission. |
+| `unshareReport` | Removes a user's share of a report of any type, and their access to its file when it updates one, as the app does. |
+| `batchShareReports` | Shares up to 50 reports of any type with the same members, with the same permission, as shareReport does for one. |
+| `updateReportSchedules` | Replaces the schedules of a report of any type, at most 10; an empty list removes them all. |
+| `batchUpdateReportSchedules` | Gives up to 50 reports of any type the same schedules, replacing all of each report's current ones, as updateReportSchedules does for one; an empty list removes them all. |
+| `sendReportEmail` | Emails a report to its recipients now, as it is. |
+| `sendReportTestEmail` | Sends a report's email to the user only, and waits until it is sent. |
+| `startBurstRun` | Starts a run of every variant of a burst, or of the variants passed, as startReportRun does for each: it refreshes the variant's data, and repairs a Rollstack report's slides with AI. |
+| `sendBurstEmailConfig` | Sends a burst's email configuration now: one email to its recipients with each variant it selects. |
+| `sendBurstVariantEmails` | Sends each variant's own email now, to its own recipients, as the app's Send does: every variant, or those passed. |
+| `deleteBurst` | Deletes a burst with every report in it, the template included, as the app does, and can't be undone. |
+| `deleteBurstEmailConfig` | Deletes a burst's email configuration. |
+| `removeBurstVariants` | Removes variants of a burst by their ids, and deletes their reports. |
+| `sendBurstEmailConfigTest` | Sends a burst's email configuration to you alone, to check how it looks before sending it. |
+| `shareFolder` | Shares a folder and everything in it with a member of the organization, or changes their permission, as Share in the app does. |
+| `unshareFolder` | Removes a member's direct share of a folder, and their access to its reports' files in Drive unless they still reach the folder through a parent folder, as the app does. |
 
 <!-- careful:end -->
 
@@ -337,6 +329,6 @@ Built with n8n's node CLI (`@n8n/node-cli`) and `n8nNodesApiVersion` 1. It uses 
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-- [Rollstack's MCP server and API reference](https://docs.rollstack.com/api/mcp-server)
+- [Rollstack's API reference](https://docs.rollstack.com/api)
 - [How Rollstack keys and sign-in work](https://rollstack.com/auth.md)
 - Support: support@rollstack.com

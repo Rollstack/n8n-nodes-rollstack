@@ -22,7 +22,7 @@ const toolNames = new RegExp(`\\b(${Object.keys(toolSpecs).join('|')})\\b`, 'g')
 const aToolName = new RegExp(toolNames.source);
 
 // The steps a user takes first on a resource, which email nobody and delete nothing
-const FIRST_STEPS = new Set(['sendReportMessage', 'submitFeedback']);
+const FIRST_STEPS = new Set(['sendReportMessage']);
 
 // The node's parameters with their defaults, as n8n fills them in when it loads a workflow
 function withDefaults(description, parameters) {

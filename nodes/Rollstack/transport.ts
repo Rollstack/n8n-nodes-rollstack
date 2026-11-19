@@ -1,24 +1,28 @@
 import type { IDataObject, IExecuteFunctions, IHttpRequestOptions, JsonObject } from 'n8n-workflow';
-import { NodeApiError, randomString, sleep } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError, sleep } from 'n8n-workflow';
 
-// Every operation is one `tools/call` on Rollstack's MCP server: a JSON-RPC message sent over HTTPS, signed with the
-// credential's API key. Calls go through the MCP server rather than the REST API because there Rollstack makes the
-// user confirm, in Rollstack, a call that emails people or deletes reports, whatever the kind of key.
-export const MCP_URL = 'https://api.rollstack.com/public/v1/mcp';
-const PROTOCOL_VERSION = '2025-06-18';
+import type { ToolSpec } from './types';
+
+// Every operation is one request to Rollstack's REST API (https://docs.rollstack.com/api), signed with the credential's
+// API key
+export const API_URL = 'https://api.rollstack.com/public/v1';
 const CREDENTIAL = 'rollstackApi';
-const USER_AGENT = 'n8n-nodes-rollstack/0.1.0';
+export const USER_AGENT = 'n8n-nodes-rollstack/0.2.0';
 
-// A call waits up to 30 seconds on Rollstack's side (waitSeconds) and importing a deck can take a minute, so the time
-// allowed for an answer leaves room for both
+// A request waits up to 30 seconds on Rollstack's side (waitSeconds) and importing a deck can take a minute, so the
+// time allowed for an answer leaves room for both
 const TIMEOUT_MS = 90_000;
 
 // Gateway answers worth another try: reads are safe to repeat, and writes carry an idempotency key
 const RETRY_STATUSES = new Set([502, 503, 504]);
 const RETRY_DELAYS_MS = [1_000, 2_000];
 
-// The code of a call that waits for the user to confirm it in Rollstack, such as a run that emails the report
+// The code of a call that waits for the user to confirm it in Rollstack. With an API key, Rollstack runs every call at
+// once, but should it ask for a confirmation, the answer carries the link to confirm at, and isn't an error
 export const CONFIRMATION_REQUIRED = 'confirmation-required';
+
+// Endpoints that answer images as base64 data in a list of their answer, which the node returns as binary data
+const IMAGE_LISTS: Record<string, string> = { getReportSlideImages: 'slides' };
 
 interface Reply {
 	status: number;
@@ -26,8 +30,8 @@ interface Reply {
 	headers: Record<string, string>;
 }
 
-/** What a tool answered: its JSON, and the images it sent, as base64 data with their MIME type. */
-export interface ToolResult {
+/** What an endpoint answered: its JSON, and the images it sent, as base64 data with their MIME type. */
+export interface Result {
 	json: IDataObject;
 	images: Array<{ data: string; mimeType: string }>;
 }
@@ -44,39 +48,9 @@ function parseJson(text: string): unknown {
 	}
 }
 
-function request(method: string, params: IDataObject): IDataObject {
-	return { jsonrpc: '2.0', id: randomString(16), method, params };
-}
-
-function answers(message: unknown, id: unknown): message is IDataObject {
-	return isObject(message) && message.id === id && ('result' in message || 'error' in message);
-}
-
-/** The JSON-RPC answer to `id` in a stream of server-sent events, or undefined when it has none. */
-export function readEventStream(text: string, id: unknown): unknown {
-	let data: string[] = [];
-	for (const line of `${text}\n\n`.split(/\r?\n/)) {
-		if (line.startsWith('data:')) {
-			data.push(line.slice(5).replace(/^ /, ''));
-			continue;
-		}
-		if (line !== '') continue;
-		// A blank line ends an event
-		const message = parseJson(data.join('\n'));
-		data = [];
-		if (answers(message, id)) return message;
-	}
-	return undefined;
-}
-
 function header(headers: Record<string, unknown>, name: string): string {
 	const found = Object.entries(headers).find(([key]) => key.toLowerCase() === name.toLowerCase());
 	return found ? String(found[1]) : '';
-}
-
-/** Whether `body` is an error of the MCP transport itself, rather than one of Rollstack's API. */
-function isRpcError(body: unknown): boolean {
-	return isObject(body) && 'jsonrpc' in body && isObject(body.error);
 }
 
 function isTimeout(error: unknown): boolean {
@@ -96,28 +70,51 @@ function isConnectionError(error: unknown): boolean {
 	);
 }
 
-async function postOnce(
+/** The endpoint's path with its path parameters filled in. */
+function pathOf(this: IExecuteFunctions, spec: ToolSpec, params: IDataObject): string {
+	return spec.path.replace(/\{(\w+)\}/g, (_, name: string) => {
+		const value = params[name];
+		if (value === undefined || value === null || String(value).trim() === '')
+			throw new NodeOperationError(this.getNode(), `The parameter ${name} is empty`);
+		return encodeURIComponent(String(value));
+	});
+}
+
+/** The request an operation sends, from the arguments buildArguments made. */
+export function requestOf(
 	this: IExecuteFunctions,
-	message: IDataObject,
-	headers: Record<string, string>,
-): Promise<Reply> {
+	spec: ToolSpec,
+	args: IDataObject,
+): IHttpRequestOptions {
+	const params = isObject(args.params) ? args.params : {};
+	const query = isObject(args.query) ? args.query : undefined;
+	const body = isObject(args.body) ? args.body : undefined;
+	const headers: Record<string, string> = { Accept: 'application/json', 'User-Agent': USER_AGENT };
+	if (typeof args.idempotencyKey === 'string' && args.idempotencyKey)
+		headers['Idempotency-Key'] = args.idempotencyKey;
 	const options: IHttpRequestOptions = {
-		method: 'POST',
-		url: MCP_URL,
-		headers: {
-			// The server answers a call as JSON or as an event stream, and refuses a client that doesn't accept both
-			Accept: 'application/json, text/event-stream',
-			'Content-Type': 'application/json',
-			'User-Agent': USER_AGENT,
-			...headers,
-		},
-		body: message,
+		method: spec.method,
+		url: `${API_URL}${pathOf.call(this, spec, params)}`,
+		headers,
 		encoding: 'text',
 		json: false,
 		returnFullResponse: true,
 		ignoreHttpStatusErrors: true,
 		timeout: TIMEOUT_MS,
 	};
+	if (query && Object.keys(query).length) {
+		options.qs = query;
+		// A list in the query repeats its parameter, as in ?slideIds=a&slideIds=b
+		options.arrayFormat = 'repeat';
+	}
+	if (body && spec.method !== 'GET') {
+		headers['Content-Type'] = 'application/json';
+		options.body = JSON.stringify(body);
+	}
+	return options;
+}
+
+async function sendOnce(this: IExecuteFunctions, options: IHttpRequestOptions): Promise<Reply> {
 	const response = (await this.helpers.httpRequestWithAuthentication.call(
 		this,
 		CREDENTIAL,
@@ -127,32 +124,27 @@ async function postOnce(
 		headers: Record<string, string>;
 		statusCode: number;
 	};
-	const responseHeaders = response.headers ?? {};
-	let body = response.body;
-	if (typeof body === 'string') {
-		body = header(responseHeaders, 'content-type').startsWith('text/event-stream')
-			? readEventStream(body, message.id)
-			: parseJson(body);
-	}
-	return { status: response.statusCode, body, headers: responseHeaders };
+	const body = response.body;
+	return {
+		status: response.statusCode,
+		body: typeof body === 'string' ? (body.trim() === '' ? undefined : parseJson(body)) : body,
+		headers: response.headers ?? {},
+	};
 }
 
-async function post(
-	this: IExecuteFunctions,
-	message: IDataObject,
-	headers: Record<string, string>,
-): Promise<Reply> {
+async function send(this: IExecuteFunctions, options: IHttpRequestOptions): Promise<Reply> {
 	for (let attempt = 0; ; attempt++) {
 		const delay = RETRY_DELAYS_MS[attempt];
 		try {
-			const reply = await postOnce.call(this, message, headers);
+			const reply = await sendOnce.call(this, options);
 			if (delay === undefined || !RETRY_STATUSES.has(reply.status)) return reply;
 		} catch (error) {
 			if (isTimeout(error)) {
-				// Not sent again: the call may be running, and waiting another 90 seconds helps nobody
+				// Not sent again: the request may be running, and waiting another 90 seconds helps nobody
 				throw new NodeApiError(this.getNode(), error as JsonObject, {
 					message: `Rollstack did not answer within ${TIMEOUT_MS / 1000} seconds`,
-					description: 'The call may still have run: check in Rollstack before you run it again.',
+					description:
+						'The request may still have run: check in Rollstack before you run it again.',
 				});
 			}
 			if (!isConnectionError(error)) throw new NodeApiError(this.getNode(), error as JsonObject);
@@ -167,96 +159,57 @@ async function post(
 	}
 }
 
-/** Starts an MCP session and returns the headers that continue it. */
-async function openSession(this: IExecuteFunctions): Promise<Record<string, string>> {
-	const opening = {
-		protocolVersion: PROTOCOL_VERSION,
-		capabilities: {},
-		clientInfo: { name: 'n8n-nodes-rollstack', version: '0.1.0' },
-	};
-	const reply = await post.call(this, request('initialize', opening), {});
-	const result = isObject(reply.body) ? reply.body.result : undefined;
-	if (reply.status !== 200 || !isObject(result)) throw httpError.call(this, reply);
-	const headers: Record<string, string> = {
-		'MCP-Protocol-Version': String(result.protocolVersion ?? PROTOCOL_VERSION),
-	};
-	const session = header(reply.headers, 'mcp-session-id');
-	if (session) headers['Mcp-Session-Id'] = session;
-	await post.call(this, { jsonrpc: '2.0', method: 'notifications/initialized' }, headers);
-	return headers;
-}
-
-/** Runs one Rollstack tool and returns what it answered. Throws a NodeApiError when it failed. */
-export async function callTool(
+/** Calls the endpoint of an operation and returns what it answered. Throws a NodeApiError when it failed. */
+export async function callEndpoint(
 	this: IExecuteFunctions,
-	name: string,
+	spec: ToolSpec,
 	args: IDataObject,
-): Promise<ToolResult> {
-	const message = request('tools/call', { name, arguments: args });
-	let reply = await post.call(this, message, { 'MCP-Protocol-Version': PROTOCOL_VERSION });
-	if ((reply.status === 400 || reply.status === 404) && isRpcError(reply.body)) {
-		// Rollstack's server answers each call on its own, without a session. Should it start to ask for one, which a
-		// server does with this answer, open a session and send the call again
-		reply = await post.call(this, message, await openSession.call(this));
-	}
-	return toolResult.call(this, reply);
+): Promise<Result> {
+	const reply = await send.call(this, requestOf.call(this, spec, args));
+	return resultOf.call(this, spec, reply);
 }
 
-export function toolResult(this: IExecuteFunctions, reply: Reply): ToolResult {
-	const result = isObject(reply.body) ? reply.body.result : undefined;
-	if (reply.status !== 200 || !isObject(result)) throw httpError.call(this, reply);
+export function resultOf(this: IExecuteFunctions, spec: ToolSpec, reply: Reply): Result {
+	const { status, body } = reply;
+	if (status === 428 && isObject(body) && body.code === CONFIRMATION_REQUIRED)
+		return { json: body, images: [] };
+	if (status < 200 || status >= 300) throw httpError.call(this, reply);
 
-	const blocks = Array.isArray(result.content) ? (result.content as unknown[]) : [];
-	const texts: string[] = [];
-	const images: ToolResult['images'] = [];
-	for (const block of blocks) {
-		if (!isObject(block)) continue;
-		if (block.type === 'text' && typeof block.text === 'string') texts.push(block.text);
-		if (
-			block.type === 'image' &&
-			typeof block.data === 'string' &&
-			typeof block.mimeType === 'string'
-		)
-			images.push({ data: block.data, mimeType: block.mimeType });
-	}
-	let json: IDataObject | undefined = isObject(result.structuredContent)
-		? result.structuredContent
-		: undefined;
-	if (!json) {
-		for (const text of texts) {
-			const value = parseJson(text);
-			if (isObject(value)) {
-				json = value;
-				break;
-			}
-			if (Array.isArray(value)) {
-				json = { items: value };
-				break;
-			}
-		}
-	}
-	json ??= texts.length ? { text: texts.join('\n') } : {};
+	// Only a 204 answers no content. Any other success must answer JSON the node can read
+	let json: IDataObject;
+	if (status === 204) json = { success: true };
+	else if (isObject(body)) json = body;
+	else if (Array.isArray(body)) json = { items: body as IDataObject[] };
+	else throw httpError.call(this, reply);
 
-	// A call that waits for the user's confirmation didn't fail: its answer carries the link they confirm it at
-	if (result.isError === true && json.code !== CONFIRMATION_REQUIRED) {
-		const text =
-			typeof json.message === 'string' && json.message ? json.message : texts.join('\n').trim();
-		throw new NodeApiError(this.getNode(), json as JsonObject, {
-			message: withCode(text || 'Rollstack answered an error without a message', json.code),
-			httpCode: String(reply.status),
-		});
+	const images: Result['images'] = [];
+	const list = IMAGE_LISTS[spec.tool];
+	if (list && Array.isArray(json[list])) {
+		json = {
+			...json,
+			[list]: (json[list] as unknown[]).map((entry) => {
+				if (
+					!isObject(entry) ||
+					typeof entry.data !== 'string' ||
+					typeof entry.mimeType !== 'string'
+				)
+					return entry;
+				images.push({ data: entry.data, mimeType: entry.mimeType });
+				const rest: IDataObject = { ...entry };
+				delete rest.data;
+				return { ...rest, binaryProperty: `image${images.length}` };
+			}),
+		};
 	}
 	return { json, images };
 }
 
-/** The error for an answer that isn't a tool result: Rollstack's `{ code, message }` or a JSON-RPC error. */
+/** The error for an answer that failed: Rollstack's `{ code, message }`, or what the status says. */
 function httpError(this: IExecuteFunctions, reply: Reply): NodeApiError {
 	const body = isObject(reply.body) ? reply.body : {};
-	const source = isObject(body.error) ? body.error : body;
-	const described =
-		typeof source.message === 'string' && source.message ? source.message : undefined;
+	const described = typeof body.message === 'string' && body.message ? body.message : undefined;
 	const code =
-		typeof source.code === 'string' || typeof source.code === 'number' ? source.code : undefined;
+		typeof body.code === 'string' || typeof body.code === 'number' ? body.code : undefined;
 	let message: string;
 	let description: string | undefined;
 	if (reply.status === 401) {
