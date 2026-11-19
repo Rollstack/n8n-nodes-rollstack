@@ -30,7 +30,7 @@ The key acts as the Rollstack user who created it, in that user's organization, 
 
 ## Operations
 
-Each operation calls one endpoint of Rollstack's REST API: one of those Rollstack's MCP server also offers as a tool, with the tool's inputs and description. Required inputs are parameters of their own; optional ones are under **Additional Fields**. An input that takes several values takes them separated by commas, or as a JSON array. A structured input takes JSON, and its description gives the JSON Schema.
+Each operation calls one endpoint of Rollstack's REST API that Rollstack's MCP server also offers as a tool, and takes that tool's inputs and description. Required inputs are parameters of their own; optional ones are under **Additional Fields**. An input that takes several values takes them separated by commas, or as a JSON array. A structured input takes JSON, and its description gives the JSON Schema.
 
 Each operation returns Rollstack's answer as one item. A list comes back with the cursor of its next page, which you pass to the same operation to get that page.
 

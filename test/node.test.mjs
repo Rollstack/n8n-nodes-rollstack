@@ -3,7 +3,8 @@ import { test } from 'node:test';
 
 import { context, json, require } from './helpers.mjs';
 
-const { API_URL } = require('../dist/nodes/Rollstack/transport.js');
+// Written out here rather than read from the transport, so that a wrong address there fails the tests
+const API_URL = 'https://api.rollstack.com/public/v1';
 
 const { Rollstack } = require('../dist/nodes/Rollstack/Rollstack.node.js');
 

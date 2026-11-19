@@ -4,9 +4,12 @@ import { test } from 'node:test';
 
 import { context, json, require } from './helpers.mjs';
 
-const { callEndpoint, API_URL, USER_AGENT } = require('../dist/nodes/Rollstack/transport.js');
+const { callEndpoint, USER_AGENT } = require('../dist/nodes/Rollstack/transport.js');
 const { toolSpecs } = require('../dist/nodes/Rollstack/generated.js');
 const { version } = require('../package.json');
+
+// Written out here rather than read from the transport, so that a wrong address there fails the tests
+const API_URL = 'https://api.rollstack.com/public/v1';
 
 test('a read is one signed GET, with its query', async () => {
 	const ctx = context({ responses: [json(200, { reports: [], nextCursor: null })] });
@@ -48,6 +51,16 @@ test('a list in the query repeats its parameter', async () => {
 	const [{ options }] = ctx.requests;
 	assert.deepEqual(options.qs, { slideIds: ['a', 'b'] });
 	assert.equal(options.arrayFormat, 'repeat');
+});
+
+test('a success that answers JSON the node cannot read is an error, not an empty success', async () => {
+	for (const reply of [json(200, '{not json'), { statusCode: 200, headers: {}, body: '' }]) {
+		const ctx = context({ responses: [reply] });
+		await assert.rejects(callEndpoint.call(ctx, toolSpecs.listReports, {}), (error) => {
+			assert.match(error.message, /cannot read/);
+			return true;
+		});
+	}
 });
 
 test('an answer with no content, or a list, still becomes one item', async () => {

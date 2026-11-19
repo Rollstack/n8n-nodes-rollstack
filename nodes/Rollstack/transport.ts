@@ -175,8 +175,9 @@ export function resultOf(this: IExecuteFunctions, spec: ToolSpec, reply: Reply):
 		return { json: body, images: [] };
 	if (status < 200 || status >= 300) throw httpError.call(this, reply);
 
+	// Only a 204 answers no content. Any other success must answer JSON the node can read
 	let json: IDataObject;
-	if (body === undefined) json = { success: true };
+	if (status === 204) json = { success: true };
 	else if (isObject(body)) json = body;
 	else if (Array.isArray(body)) json = { items: body as IDataObject[] };
 	else throw httpError.call(this, reply);
