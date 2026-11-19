@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# Cancel in-progress runs for the same branch/PR to avoid wasting CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: 'npm ci'
+
+      # Fails when nodes/Rollstack/generated.ts or README.md's tables don't match definitions/
+      - name: Check generated files
+        run: 'npm run generate:check'
+
+      - name: Run lint
+        run: 'npm run lint'
+
+      # Builds, then runs the tests against the build
+      - name: Run tests
+        run: 'npm test'
