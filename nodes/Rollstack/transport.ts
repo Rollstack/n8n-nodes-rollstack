@@ -7,7 +7,7 @@ import type { ToolSpec } from './types';
 // API key
 export const API_URL = 'https://api.rollstack.com/public/v1';
 const CREDENTIAL = 'rollstackApi';
-export const USER_AGENT = 'n8n-nodes-rollstack/0.2.0';
+export const USER_AGENT = 'n8n-nodes-rollstack/0.2.1';
 
 // A request waits up to 30 seconds on Rollstack's side (waitSeconds) and importing a deck can take a minute, so the
 // time allowed for an answer leaves room for both

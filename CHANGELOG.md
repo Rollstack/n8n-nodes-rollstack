@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- No change to the node. Published again so n8n's Creator Portal can run its verification pre-check on a new version.
+
 ## 0.2.0
 
 - The node now calls Rollstack's REST API rather than its MCP server, as n8n requires of verified community nodes. Each operation is one request to the endpoint its tool calls, with the same parameters.
